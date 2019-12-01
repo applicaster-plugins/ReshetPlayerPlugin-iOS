@@ -1,0 +1,59 @@
+{
+    "api": {
+        "require_startup_execution": true,
+        "class_name": "ReshetPluggablePlayer",
+        "modules": [
+            "ReshetPlayerPlugin"
+        ]
+    },
+    "dependency_repository_url": [
+        "https://github.com/applicaster-plugins/ReshetPlayerPlugin-iOS"
+    ],
+    "platform": "ios",
+    "author_name": "Roi Kedarya",
+    "author_email": "r.kedarya@applicaster.com",
+    "manifest_version": "0.0.1",
+    "name": "Reshet Player",
+    "description": "Plugin Player for Reshet including DVR support and arti media adds and Kantar media library for rating measurement",
+    "type": "player",
+    "identifier": "ReshetPlayerPlugin",
+    "ui_builder_support": false,
+    "dependency_name": "ReshetPlayerPlugin",
+    "dependency_versi on": "0.0.1",
+    "whitelisted_account_ids": [
+        "5891b9f978f9f300171455e5",
+        "576fceae636566000f000000"
+    ],
+    "min_zapp_sdk": "12.2.0",
+    "deprecated_since_zapp_sdk": "",
+    "unsupported_since_zapp_sdk": "",
+    "react_native": false,
+    "custom_configuration_fields": [
+        {
+            "type": "text",
+            "key": "siteKey",
+            "tooltip_text": "Artimedia mandatory site key for the SDK init phase"
+        },
+        {
+            "type": "checkbox",
+            "key": "show_ads_on_payed",
+            "default": 0,
+            "tooltip_text": "Display ads on payed items"
+        },
+        {
+            "type": "text",
+            "key": "kantar_site_name",
+            "tooltip_text": "unique Kantar system name per broadcaster - assigned by Kantar"
+        },
+        {
+            "type": "text",
+            "key": "live_stream",
+            "tooltip_text": "url for live streaming"
+        },
+        {
+            "type": "text",
+            "key": "c1_cut_time",
+            "tooltip_text": "cut time for c+1 time frame"
+        }
+    ]
+}
