@@ -67,9 +67,40 @@ public class ReshetPluggablePlayer: APPlugablePlayerBase, ZPAppLoadingHookProtoc
         super .presentPlayerFullScreen(rootViewController, configuration: configuration)
         if let playerViewController = self.playerViewController {
             playerViewController.controls = playerViewController.reshetPlayerControls()
+            addObserver()
         }
     }
- 
+    
+    func addObserver() {
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(stop),
+            name: NSNotification.Name(rawValue: "APPlayerControllerReachedEndNotification"),
+            object: nil)
+        
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(stop),
+            name: NSNotification.Name(rawValue: "APPlayerDidStopNotification"),
+            object: nil)
+    }
+    
+    func removeObservers() {
+        NotificationCenter.default.removeObserver(self, name:NSNotification.Name(rawValue: "APPlayerControllerReachedEndNotification"), object:nil)
+        
+        NotificationCenter.default.removeObserver(self, name:NSNotification.Name(rawValue: "APPlayerDidStopNotification"), object:nil)
+        
+    }
+    
+    @objc func stop() {
+        
+        removeObservers()
+        let weakSelf = self
+        self.playerViewController?.dismiss(animated: true, completion: {
+            weakSelf.currentPlayableItem = nil
+        })
+    }
+    
     public func videoLoadingView() -> (UIView & APLoadingView)? {
         var loadingView: (UIView & APLoadingView)?
         
