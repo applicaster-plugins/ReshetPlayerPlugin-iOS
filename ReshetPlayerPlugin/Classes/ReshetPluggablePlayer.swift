@@ -14,12 +14,15 @@ public class ReshetPluggablePlayer: APPlugablePlayerBase, ZPAppLoadingHookProtoc
     var playerViewController: ReshetPlayerViewController?
     var currentPlayableItem: ZPPlayable?
     
-    public required override init() {
-        super.init()
-    }
+    public required override init() { }
 
-    public required init(configurationJSON: NSDictionary?) {
-        super.init()
+    public required init(configurationJSON: NSDictionary?) { }
+    
+    public static func pluggablePlayerInit(playableItem item: ZPPlayable?) -> ZPPlayerProtocol?{
+        if let item = item {
+            return self.pluggablePlayerInit(playableItems: [item])
+        }
+        return nil
     }
     
     open class func pluggablePlayerInit(playableItems items: [ZPPlayable]?, configurationJSON: NSDictionary? = nil) -> ZPPlayerProtocol?{
@@ -60,13 +63,12 @@ public class ReshetPluggablePlayer: APPlugablePlayerBase, ZPAppLoadingHookProtoc
 //        }
 //    }
     
-//    public override func presentPlayerFullScreen(_ rootViewController: UIViewController, configuration: ZPPlayerConfiguration?) {
-//        super .presentPlayerFullScreen(rootViewController, configuration: configuration)
-//        super.prese
-//        if let playerViewController = self.playerViewController {
-//            playerViewController.controls = playerViewController.reshetPlayerControls()
-//        }
-//    }
+    public override func presentPlayerFullScreen(_ rootViewController: UIViewController, configuration: ZPPlayerConfiguration?) {
+        super .presentPlayerFullScreen(rootViewController, configuration: configuration)
+        if let playerViewController = self.playerViewController {
+            playerViewController.controls = playerViewController.reshetPlayerControls()
+        }
+    }
  
     public func videoLoadingView() -> (UIView & APLoadingView)? {
         var loadingView: (UIView & APLoadingView)?

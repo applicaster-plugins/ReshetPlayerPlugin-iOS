@@ -54,6 +54,8 @@
 
 @implementation ReshetPlayerViewController
 
+//@synthesize configurationJSON;
+
 #pragma mark - Player Life Cycle Methods
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
@@ -121,7 +123,7 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    self.playerController.controls = [self reshetPlayerControls];
+    [self setControls:[self reshetPlayerControls]];
 }
 
 - (void)setControls:(UIView<APPlayerControls> *)controls {
@@ -150,7 +152,7 @@
 }
 
 - (BOOL)isDVRSupported {
-    //return [self.playerController.player isDVRSupported];
+
     BOOL retVal = NO;
     NSURL *CurrentlyPlayingUrl = [self CurrentlyPlayingUrl];
     retVal = ([[CurrentlyPlayingUrl absoluteString] containsString:@"DVR"]);
@@ -215,9 +217,9 @@
 }
 
 - (id)initWithPlayableItems:(NSArray *)items {
-    if (self = [super initWithPlayableItems:items]) {
-        self.controls = [self reshetPlayerControls];
-    }
+//    if (self = [super initWithPlayableItems:items]) {
+//        self.controls = [self reshetPlayerControls];
+//    }
     return self;
 }
 
@@ -716,8 +718,6 @@
     timer = nil;
     [self play];
 }
-
-@synthesize configurationJSON;
 
 @end
 
