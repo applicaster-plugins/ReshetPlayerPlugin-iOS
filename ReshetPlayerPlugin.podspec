@@ -16,7 +16,7 @@ Pod::Spec.new do |s|
   s.swift_version          = '5.0'
 
   s.subspec 'Kantar' do |k|
-    k.vendored_libraries  = 'ReshetPlayerPlugin/Kantar/kantarmedia-streaming-fat.a'
+    # k.vendored_libraries  = 'ReshetPlayerPlugin/Kantar/kantarmedia-streaming-fat.a'
     k.public_header_files = "ReshetPlayerPlugin/Kantar/*.h"
     k.source_files = 'ReshetPlayerPlugin/Kantar/*.{swift,h,m}'
     # k.xcconfig = {

@@ -6,6 +6,7 @@
 //
 
 #import "ReshetPlayerViewController.h"
+#import "ReshetPlayerControlsView.h"
 #import "ArtiSDK/AMSDK.h"
 #import "KMA_SpringStreams.h"
 
@@ -28,7 +29,6 @@
 @property (nonatomic, strong) id <AMSDKAPI> amsdkapi;
 @property (nonatomic, strong) NSThread* updateContentUIThread;
 @property (nonatomic, strong) UIView* adContainerView;
-@property (nonatomic, strong) NSDictionary* artiParams;
 @property (nonatomic, strong) UITapGestureRecognizer * singleTapRecognizer;
 @property (nonatomic, strong) NSString *artiMediaSiteKey;
 @property (nonatomic, assign) APPlayerViewControllerDisplayMode lastPlayerDisplayMode;
@@ -42,7 +42,13 @@
 @property (nonatomic, strong) Reshet_MediaPlayerAdapter *adapter;
 @property (nonatomic, assign) NSTimeInterval timeIntervalFromServer;
 @property (nonatomic, assign) BOOL didSetDeltaInStorage;
-@property (nonatomic, assign) NSTimeInterval Delta;
+@property (nonatomic, assign) NSTimeInterval delta;
+@property (nonatomic, strong) NSString *cutTime;
+
+@property (nonatomic, strong) id<ZPPlayable> currentlyPlayingItem;
+
+//ReshetPlayerControlsView *controls;
+@property (nonatomic, strong) APQueuePlayer *queuePlayer;
 
 @end
 
@@ -51,8 +57,7 @@
 #pragma mark - Player Life Cycle Methods
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
-    //[self requestServerForCurrentTime];
-    
+    //self.playerController.player
     if([self shouldDisplayAds]) {
         if ([self ignoreAdsOnChangeMode]) {
             //If the player was paused due to an ad and the view got desroid it will start on paused
@@ -96,6 +101,7 @@
             }
         }
     } else {
+        [self addObservers];
         NSTimer *t = [NSTimer scheduledTimerWithTimeInterval:2.0
                                                       target:self
                                                     selector:@selector(onTick:)
@@ -104,6 +110,22 @@
         [[NSRunLoop mainRunLoop] addTimer:t forMode:NSRunLoopCommonModes];
     }
     self.lastPlayerDisplayMode = self.currentPlayerDisplayMode;
+    if ([self.currentlyPlayingItem isKindOfClass:[APAtomEntryPlayable class]]) {
+        APAtomEntry *atomEntry = ((APAtomEntryPlayable *)self.currentlyPlayingItem).atomEntry;
+        BOOL isInFrame = [self isAtomItem:atomEntry InTimeFrame:self.cutTime];
+        if (isInFrame) {
+            
+        }
+    }
+}
+
+- (void)viewDidLoad {
+    [super viewDidLoad];
+    self.playerController.controls = [self reshetPlayerControls];
+}
+
+- (void)setControls:(UIView<APPlayerControls> *)controls {
+    [super setControls:controls];
 }
 
 - (void)viewDidAppear:(BOOL)animated {
@@ -116,18 +138,11 @@
         }
         
     }
-        APSlider *slider = self.playerController.controls.seekSlider;
-        slider.hidden = ![self isDVRSupported];
-    if (slider.hidden == NO) {
-        UIImage *thumbImage = [APApplicasterResourcesHelper imageNamed:@"player_controls_seek_button"];
-        [slider setThumbImage:thumbImage forState:UIControlStateNormal];
-    }
+//    APSlider *slider = self.controls.seekSlider;
+//    slider.hidden = ![self isDVRSupported];
     if (self.kantarAttributes) {
         [self startKantarMesurment];
     }
-//    if (self.adapter) {
-//        [self.adapter getPosition];
-//    }
 //    if ([self.playerController.player.defaultControls isKindOfClass:[APPlayerControlsView class]]) {
 //        APPlayerControlsView * controls = (APPlayerControlsView *)self.playerController.player.defaultControls;
 //        [controls customizeSeekSliderView:slider];
@@ -135,7 +150,16 @@
 }
 
 - (BOOL)isDVRSupported {
-    return [self.playerController.player isDVRSupported];
+    //return [self.playerController.player isDVRSupported];
+    BOOL retVal = NO;
+    NSURL *CurrentlyPlayingUrl = [self CurrentlyPlayingUrl];
+    retVal = ([[CurrentlyPlayingUrl absoluteString] containsString:@"DVR"]);
+    return retVal;
+}
+
+-(NSURL *)CurrentlyPlayingUrl {
+    AVAsset *currentPlayerAsset = self.queuePlayer.player.currentItem.asset;
+    return [currentPlayerAsset isKindOfClass:AVURLAsset.class] ? [(AVURLAsset *)currentPlayerAsset URL] : nil;
 }
 
 - (void)viewWillDisappear:(BOOL)animated {
@@ -149,7 +173,7 @@
         [self stopUpdateContentUIThread];
         [self removeObservers];
         [self.adContainerView removeFromSuperview];
-        [self.playerController.player.playerView removeGestureRecognizer:self.singleTapRecognizer];
+        [self.queuePlayer.playerView removeGestureRecognizer:self.singleTapRecognizer];
         
         [self destroyAMSdk];
         _adContainerView = nil;
@@ -170,10 +194,7 @@
     if (self = [super initWithPlayableItems:items])
     {
         _artiParams = dictionary;
-        _artiMediaSiteKey = [dictionary objectForKey:@"siteKey"];
-        
-        _KantarMediaSiteName = [dictionary objectForKey:@"site_name"];
-        
+        _artiMediaSiteKey = [dictionary objectForKey:@"artimedia_site_key"];
         NSNumber *showAdsOnPaidItems = [dictionary objectForKey:@"show_ads_on_payed"];
         //If showAdsOnPaidItems flag is not set (defualt mode), set it to NO
         if (showAdsOnPaidItems) {
@@ -182,13 +203,32 @@
             shouldShowAdsOnPayedItems = NO;
         }
         [self ConfigureKantarAdapter];
+//        self.playerController.controls = [self reshetPlayerControls];
     }
+    _currentlyPlayingItem = items.firstObject;
+    _queuePlayer = self.playerController.player;
+    _cutTime = [dictionary objectForKey:@"c1_cut_time"];
+    _KantarMediaSiteName = [dictionary objectForKey:@"kantar_site_key"];
+    [self setDelta];
+    
+    return self;
+}
+
+- (id)initWithPlayableItems:(NSArray *)items {
+    if (self = [super initWithPlayableItems:items]) {
+        self.controls = [self reshetPlayerControls];
+    }
+    return self;
+}
+
+- (void)setDelta {
     NSString *deltaString = [ZAAppConnector.sharedInstance.storageDelegate sessionStorageValueFor:@"deltaTimeToServer"
                                                                                         namespace:@"deltaTimeToServer"];
     if (deltaString) {
-        self.Delta = [deltaString doubleValue];
+        _delta = [deltaString doubleValue];
+    } else {
+        _delta = 0;
     }
-    return self;
 }
 
 - (void)ConfigureKantarAdapter {
@@ -564,15 +604,11 @@
         APPlayer *player = notification.object;
         if (player.durationType == APPlayerContentDurationTypeIndefinite) {
             if ([self.controls respondsToSelector:@selector(updateControlsForLiveState:)]){
-                [self.controls updateControlsForLiveState:YES];
                 if ([self isDVRSupported]) {
-//                    remove this
-//                    if (self.adapter) {
-//                        [self.adapter getPosition];
-//                    }
-                    APSlider *slider = self.playerController.controls.seekSlider;
-                    [slider setContinuous:NO];
-                    slider.hidden = NO;
+                    //APSlider *slider = self.playerController.controls.seekSlider;
+                    [self.controls updateControlsForLiveState:NO];
+                } else {
+                   [self.controls updateControlsForLiveState:YES];
                 }
             }
         }
@@ -624,60 +660,54 @@
                                                   object:nil];
 }
 
-#pragma mark -
-
-- (void)executeOnApplicationReadyWithDisplayViewController:(UIViewController *)displayViewController completion:(void (^)(void))completion {
-    [self requestServerForCurrentTime];
-    completion();
-}
-
-- (void)requestServerForCurrentTime {
-    NSString *urlString = @"https://13tv.co.il/timestamp.php";
-    NSURL *url = [[NSURL alloc] initWithString:urlString];
-    NSURLRequest *urlRequest = [NSURLRequest requestWithURL:url];
-    //make request to get current serverTime
-    [APNetworkManager requestDataObjectForRequest:urlRequest completion:^(BOOL successStatus, NSData * _Nullable responseObject, NSError * _Nullable error, NSInteger statusCode) {
-        NSDictionary *options = @{NSDocumentTypeDocumentAttribute: NSHTMLTextDocumentType, NSCharacterEncodingDocumentAttribute: @(NSUTF8StringEncoding)};
-        NSMutableAttributedString *dateString = [[NSMutableAttributedString alloc] initWithData:responseObject
-                                                                                        options:options
-                                                                             documentAttributes:nil
-                                                                                          error:nil];
-        if ([dateString isNotEmpty]) {
-            NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
-            [dateFormatter setDateFormat:@"yyyy-MM-dd'T'HH:mm:ssZ"];
-            [self setDeltaFromDateString:dateString.string andFormatter:dateFormatter];
-        }
-    }];
-}
-
-- (void)setDeltaFromDateString:(NSString *)serverDateString
-                  andFormatter:(NSDateFormatter *)dateFormatter {
-    //NSString *nowDateString = [dateFormatter stringFromDate:[NSDate date]];
-    //[self convertToDateWithString:nowDateString andFormatter:dateFormatter];
-    NSDate *now = [NSDate date];
-    NSDate *serverTime = [self convertToDateWithString:serverDateString andFormatter:dateFormatter];
-    NSTimeInterval timeIntervalFromServer = [now timeIntervalSinceDate:serverTime];
-    if (timeIntervalFromServer) {
-        NSString *intervalString = [NSString stringWithFormat:@"%f", timeIntervalFromServer];
-        self.didSetDeltaInStorage = [ZAAppConnector.sharedInstance.storageDelegate sessionStorageSetValueFor:@"deltaTimeToServer" value:intervalString namespace:@"deltaTimeToServer"];
-    }
-}
-
-- (NSDate *)convertToDateWithString:(NSString *)dateString andFormatter:(NSDateFormatter *)dateFormatter{
-    NSDate *dateFromString = [dateFormatter dateFromString:dateString];
-    return dateFromString;
-}
-
 //in order to reduce the server calls to get the server time we calculate the server time using the delta
 - (NSDate *)calculateServerTimeWithDelta:(NSTimeInterval)delta {
     NSDate *currentServerTime = [[NSDate date] dateByAddingTimeInterval:delta];
     return currentServerTime;
 }
 
-//time frame is the number of hours for the c+1 time frame as defined by kantar
-- (BOOL)isInTimeFrame:(NSString *)timeFrame {
+ /*
+  time frame is the number of hours for the c+1 time frame as defined by kantar.
+  if we have an atomEntry - check it's starting time to see if it is in the time frame of c+1
+ */
+- (BOOL)isAtomItem:(APAtomEntry *)atomEntry InTimeFrame:(NSString *)cutTime {
     BOOL retVal = NO;
+    NSString *broadcastTime = [atomEntry.extensions objectForKey:@"video_start_time"];
+//    NSDate *now = [NSDate date];
+//    NSTimeInterval timeInSeconds = [now NSTimeIntervalSince1970];
+//    NSDate *serverTime = now + self.delta;
     return retVal;
+}
+
+- (void)reloadUrlForDVRSupport:(UISlider *)slider WithDuration:(CGFloat)duration {
+    // reloads the url to get the latest live stream
+    AVPlayerItem *playerItem = [AVPlayerItem playerItemWithAsset:self.queuePlayer.player.currentItem.asset];
+    [self.queuePlayer.player replaceCurrentItemWithPlayerItem: playerItem];
+    
+    //set slider's new min and max values
+    [slider setMaximumValue: duration];
+    [slider setMinimumValue:0.0];
+    [slider setValue:duration];
+}
+
+- (void)controlsSliderChangeEnded:(id)sender {
+    [super.self.queuePlayer controlsSliderChangeEnded:sender];
+    if ([self isDVRSupported]) { //check for DVR support
+        UISlider *slider = (UISlider *)sender;
+        CMTimeRange seekableRange = [self.queuePlayer.player.currentItem.seekableTimeRanges.lastObject CMTimeRangeValue];
+        CGFloat seekableDuration = CMTimeGetSeconds(seekableRange.duration);
+        BOOL isSliderReachLivePoint = ([slider maximumValue] == [slider value]);
+        if (isSliderReachLivePoint) {
+            [self reloadUrlForDVRSupport:slider WithDuration:seekableDuration];
+        }
+    }
+}
+
+- (UIView<APPlayerControls> *)reshetPlayerControls
+{
+    return [[NSBundle bundleForClass:self.class] loadNibNamed:@"ReshetPlayerControlsView"
+                                                        owner:self
+                                                      options:nil].firstObject;
 }
 
 #pragma mark - Timer hack
@@ -686,4 +716,10 @@
     timer = nil;
     [self play];
 }
+
+@synthesize configurationJSON;
+
 @end
+
+
+

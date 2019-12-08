@@ -7,11 +7,25 @@ import ApplicasterSDK
 import ZappPlugins
 import UIKit
 
-public class ReshetPluggablePlayer: APPlugablePlayerDefault {
+public class ReshetPluggablePlayer: APPlugablePlayerBase, ZPAppLoadingHookProtocol {
     
-    open override class func pluggablePlayerInit(playableItems items: [ZPPlayable]?, configurationJSON: NSDictionary? = nil) -> ZPPlayerProtocol?{
+    //var playerControlsView: APPlayerControls?
+    var serverTimeUrl: String?
+    var playerViewController: ReshetPlayerViewController?
+    var currentPlayableItem: ZPPlayable?
+    
+    public required override init() {
+        super.init()
+    }
+
+    public required init(configurationJSON: NSDictionary?) {
+        super.init()
+    }
+    
+    open class func pluggablePlayerInit(playableItems items: [ZPPlayable]?, configurationJSON: NSDictionary? = nil) -> ZPPlayerProtocol?{
         let instance = ReshetPluggablePlayer()
         instance.currentPlayableItems = items
+        instance.currentPlayableItem = items?.first
         instance.configurationJSON = configurationJSON
         
         if let configurationJSON = configurationJSON as? [AnyHashable : Any] {
@@ -28,10 +42,31 @@ public class ReshetPluggablePlayer: APPlugablePlayerDefault {
             let playerController = playerViewController.playerController {
             // set the video loading view
             playerController.loadingView = instance.videoLoadingView()
+            if let ServerTimeString = configurationJSON["server_time_url"] as? String {
+                instance.serverTimeUrl = ServerTimeString
+            } else {
+                instance.serverTimeUrl = "https://13tv.co.il/timestamp.php"
+            }
         }
         
         return instance;
     }
+    
+//    public override func presentPlayerFullScreen(_ rootViewController: UIViewController, configuration: ZPPlayerConfiguration?, completion: (() -> Void)?) {
+//        super .presentPlayerFullScreen(rootViewController, configuration: configuration) {
+//            if let playerViewController = self.playerViewController {
+//                playerViewController.controls = playerViewController.reshetPlayerControls()
+//            }
+//        }
+//    }
+    
+//    public override func presentPlayerFullScreen(_ rootViewController: UIViewController, configuration: ZPPlayerConfiguration?) {
+//        super .presentPlayerFullScreen(rootViewController, configuration: configuration)
+//        super.prese
+//        if let playerViewController = self.playerViewController {
+//            playerViewController.controls = playerViewController.reshetPlayerControls()
+//        }
+//    }
  
     public func videoLoadingView() -> (UIView & APLoadingView)? {
         var loadingView: (UIView & APLoadingView)?
@@ -40,6 +75,55 @@ public class ReshetPluggablePlayer: APPlugablePlayerDefault {
             loadingView = videoLoadingView as? UIView & APLoadingView
         }
         return loadingView
+    }
+    
+    public func executeOnApplicationReady(displayViewController: UIViewController?, completion: (() -> Void)?) {
+        self.getServerForCurrentTime()
+        completion?();
+    }
+    
+    func getServerForCurrentTime() {
+        if let serverTimeUrl = serverTimeUrl {
+            APNetworkManager.requestDataObject(forUrlString: serverTimeUrl, method: APNetworkManager.httpMethodGET(), parameters: nil) { (success, responseObject, error, statusCode, textEncodingName) in
+                if let responseObject = responseObject, success == true,
+                    let dateString = String(data: responseObject, encoding: .utf8) {
+                    self.setDeltaFromDateString(serverDateString: dateString)
+                }
+            }
+        }
+    }
+    
+    func setDeltaFromDateString(serverDateString:String) {
+        if let ServerTime = self.stringToDate(dateString: serverDateString) {
+            //serverTime - Now = delta
+            let deltaTimeToServer = ServerTime.timeIntervalSinceNow
+            if let storageDelegate = ZAAppConnector.sharedInstance().storageDelegate {
+                let deltaString = String(format: "%f", deltaTimeToServer)
+                let _ = storageDelegate.sessionStorageSetValue(for: "deltaTimeToServer", value: deltaString, namespace: "deltaTimeToServer")
+            }
+        }
+    }
+    
+    func stringToDate(dateString:String) -> Date? {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ssZ"
+        return formatter.date(from: dateString)
+    }
+    
+    public override func pluggablePlayerViewController() -> UIViewController? {
+        return self.playerViewController
+    }
+    
+    public func pluggablePlayerCurrentPlayableItem() -> ZPPlayable? {
+        return currentPlayableItem
+    }
+    
+    open override func pluggablePlayerType() -> ZPPlayerType {
+        return ReshetPluggablePlayer.pluggablePlayerType()
+    }
+    
+    public static func pluggablePlayerType() -> ZPPlayerType {
+        return .undefined
     }
     
 }

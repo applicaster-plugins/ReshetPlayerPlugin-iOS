@@ -7,53 +7,96 @@
         ]
     },
     "dependency_repository_url": [
-        "https://github.com/applicaster-plugins/ReshetPlayerPlugin-iOS"
+        "git@github.com:applicaster-plugins/ReshetPlayerPlugin-iOS.git"
     ],
     "platform": "ios",
     "author_name": "Roi Kedarya",
     "author_email": "r.kedarya@applicaster.com",
-    "manifest_version": "0.0.1",
+    "manifest_version": "0.0.2",
     "name": "Reshet Player",
     "description": "Plugin Player for Reshet including DVR support and arti media adds and Kantar media library for rating measurement",
     "type": "player",
     "identifier": "ReshetPlayerPlugin",
     "ui_builder_support": false,
     "dependency_name": "ReshetPlayerPlugin",
-    "dependency_versi on": "0.0.1",
+    "dependency_versi on": "0.0.2",
     "whitelisted_account_ids": [
         "5891b9f978f9f300171455e5",
         "576fceae636566000f000000"
     ],
-    "min_zapp_sdk": "12.2.0",
+    "min_zapp_sdk": "12.1.0",
     "deprecated_since_zapp_sdk": "",
     "unsupported_since_zapp_sdk": "",
     "react_native": false,
     "custom_configuration_fields": [
         {
             "type": "text",
-            "key": "siteKey",
-            "tooltip_text": "Artimedia mandatory site key for the SDK init phase"
+            "key": "artimedia_site_key",
+            "label": "Artimedia site key",
+            "placeholder": "Choose site key",
+            "tooltip_text": "ArtiMedia SiteKey"
         },
         {
             "type": "checkbox",
             "key": "show_ads_on_payed",
+            "label": "Show ads on payed",
             "default": 0,
             "tooltip_text": "Display ads on payed items"
         },
         {
             "type": "text",
-            "key": "kantar_site_name",
-            "tooltip_text": "unique Kantar system name per broadcaster - assigned by Kantar"
+            "key": "kantar_site_key",
+            "label": "Kantar site key",
+            "placeholder": "Choose site key",
+            "tooltip_text": "Kantar SiteKey"
         },
         {
             "type": "text",
-            "key": "live_stream",
-            "tooltip_text": "url for live streaming"
+            "key": "live_stream_url",
+            "label": "live stream url",
+            "placeholder": "https://...&DVR",
+            "tooltip_text": "live stream url should have &DVR attribute"
         },
         {
             "type": "text",
             "key": "c1_cut_time",
-            "tooltip_text": "cut time for c+1 time frame"
+            "label": "c1 cut time",
+            "placeholder": "HH:MM",
+            "tooltip_text": "c1 cut time in HH:MM format UTC i.e 00:00 or 23:00"
+        },
+        {
+            "type": "text",
+            "key": "c1_window_length_time",
+            "label": "c1 window length time",
+            "placeholder": "i.e 129600000 = 36 hours",
+            "tooltip_text": "c1_window_length_time in UTC, milesec sence 1970"
+        },
+        {
+            "type": "text",
+            "key": "server_time_url",
+            "label": "time server url",
+            "placeholder": "https://...",
+            "tooltip_text": "server time url"
+        },
+        {
+            "type": "text",
+            "key": "kantar_player_version_name",
+            "label": "kantart player name",
+            "placeholder": "",
+            "tooltip_text": "player version name that will be send to kantar"
+        },
+        {
+            "type": "text",
+            "key": "kantar_player_version",
+            "label": "kantar player version",
+            "placeholder": "",
+            "tooltip_text": "player version name that will be send to kantar"
+        },
+        {
+            "type": "text",
+            "key": "kantar_attribute_stream_value",
+            "placeholder": "i.e live/channelname",
+            "tooltip_text": "attribute stream value that will be send to kantar"
         }
     ]
 }

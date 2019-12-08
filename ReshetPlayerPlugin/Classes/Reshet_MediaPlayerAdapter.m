@@ -11,38 +11,50 @@
 #import "KMA_SpringStreams.h"
 #import "ReshetPlayerViewController.h"
 
+@interface Reshet_MediaPlayerAdapter()
+
+@property (nonatomic, strong) ReshetPlayerViewController *playerVC;
+@property (nonatomic, strong) KMA_Player_Meta *meta;
+
+@end
+
 @implementation Reshet_MediaPlayerAdapter
 
-ReshetPlayerViewController *controller;
-//KMA_Player_Meta *meta;
-
 - (Reshet_MediaPlayerAdapter*)adapter:(ReshetPlayerViewController *)player {
-//    meta = [[KMA_Player_Meta alloc] init];
-//    meta.playername = @"ReshetPlayerViewController";
-    controller = player;
+    _playerVC = player;
     return [super init];
 }
 
 #pragma KMA_StreamAdapter Protocol
 
+//-(KMA_Player_Meta* )getMeta {
+//    NSDictionary *params = self.playerVC.artiParams;
+//    _meta = [[KMA_Player_Meta alloc] init];
+//    _meta.playername = params[@"kantart player name"];//@"ReshetPlayerViewController";
+//    _meta.playerversion = params[@"kantar_player_version"];
+//    _meta.screenwidth = [self getWidth];
+//    _meta.screenheight = [self getHeight];
+//    return _meta;
+//}
+
 - (int) getPosition {
-    APQueuePlayer *queuePlayer = controller.playerController.player;
+    APQueuePlayer *queuePlayer = _playerVC.playerController.player;
     int livePosition = CMTimeGetSeconds(queuePlayer.player.currentItem.currentTime);
     if(livePosition < 0) livePosition = 0;
     return livePosition;
 }
 
 - (int) getDuration {
-    APQueuePlayer *queuePlayer = controller.playerController.player;
+    APQueuePlayer *queuePlayer = _playerVC.playerController.player;
     return CMTimeGetSeconds(queuePlayer.player.currentItem.duration);
 }
 
 - (int) getWidth {
-    return controller.view.bounds.size.width;
+    return _playerVC.view.bounds.size.width;
 }
 
 - (int) getHeight {
-    return controller.view.bounds.size.height;
+    return _playerVC.view.bounds.size.height;
 }
 
 -(BOOL) isCastingEnabled{
