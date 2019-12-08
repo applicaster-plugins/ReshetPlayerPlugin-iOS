@@ -59,7 +59,6 @@
 #pragma mark - Player Life Cycle Methods
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
-    //self.playerController.player
     if([self shouldDisplayAds]) {
         if ([self ignoreAdsOnChangeMode]) {
             //If the player was paused due to an ad and the view got desroid it will start on paused

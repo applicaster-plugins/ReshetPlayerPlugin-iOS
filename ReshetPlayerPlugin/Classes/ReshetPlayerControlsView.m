@@ -13,6 +13,7 @@
 
 @synthesize seekSlider;
 @synthesize stopButton;
+@synthesize volumeView = _volumeView;
 @synthesize nativeShareButton;
 @synthesize subtitlesButton;
 @synthesize chromecastButton;
@@ -44,11 +45,6 @@
 
 - (void)setStylesForControls
 {
-//    [[GAAutomationManager sharedInstance] setAccessibilityIdentifierWithView:self.stopButton identifier:AccessibilityIdApplicasterPlayerBackButton];
-//    [[GAAutomationManager sharedInstance] setAccessibilityIdentifierWithView:self.playButton identifier:AccessibilityIdApplicasterPlayerPlayButton];
-//    [[GAAutomationManager sharedInstance] setAccessibilityIdentifierWithView:self.pauseButton identifier:AccessibilityIdApplicasterPlayerPauseButton];
-//    [[GAAutomationManager sharedInstance] setAccessibilityIdentifierWithView:self.chromecastButton identifier:AccessibilityIdApplicasterPlayerChromecastButton];
-    
     //[_timeLabel setLabelStyleForKey:PlayerControlsViewTimeLabel];
     
     //_backgroundImageView.image = [GAResourceHelper imageNamed:@"player_background_tile"];
