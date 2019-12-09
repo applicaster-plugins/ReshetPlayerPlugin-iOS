@@ -1,5 +1,5 @@
 //
-//  ReshetPlayer.h
+//  ReshetPlayerViewController.h
 //
 @import ApplicasterSDK;
 
@@ -20,6 +20,8 @@
 
 - (void)setControls:(UIView<APPlayerControls> *)controls;
 
-- (UIView<APPlayerControls> *)reshetPlayerControls;
+//- (UIView<APPlayerControls> *)reshetPlayerControls;
+//
+//- (UIView<APPlayerControls> *)reshetInlinePlayerControls;
 
 @end

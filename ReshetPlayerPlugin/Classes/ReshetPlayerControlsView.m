@@ -65,13 +65,7 @@
     
     [self.subtitlesButton setImage:[APApplicasterResourcesHelper imageNamed:@"player_subtitles_btn"] forState:UIControlStateNormal];
     
-    
-//    [[GAChromecastManager sharedInstance] addButtonWithContainer:self.chromecastButton
-//                                                       topOffset:0
-//                                                           width:self.chromecastButton.bounds.size.width
-//                                                       buttonKey:@"player_chromecast_icon_color"
-//                                                           color: nil
-//                                                   useConstrains:YES];
+    [ZAAppConnector.sharedInstance.chromecastDelegate addButton:self.chromecastButton topOffset:0 width:self.chromecastButton.bounds.size.width buttonKey:@"player_chromecast_icon_color" color:nil useConstrains:YES];
 }
 
 #pragma mark - APDefaultPlayerControlsView - public
@@ -88,6 +82,13 @@
 -(void)updateControlsForLiveState:(BOOL)isLive
 {
     self.seekSlider.isLive = isLive;
+}
+
++ (UIView<APPlayerControls> *)playerControls
+{
+    return [[NSBundle bundleForClass:self.class] loadNibNamed:@"ReshetPlayerControlsView"
+                                                        owner:self
+                                                      options:nil].firstObject;
 }
 
 @end

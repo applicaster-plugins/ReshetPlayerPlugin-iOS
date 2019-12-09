@@ -16,7 +16,10 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic,readonly, weak) IBOutlet UIButton *nativeShareButton;
 @property (nonatomic, weak) IBOutlet MPVolumeView *volumeView;
 @property (weak, nonatomic) IBOutlet UIView *chromecastButton;
+
 - (void)setSliderForDVRSupport;
+
++ (UIView<APPlayerControls> *)playerControls;
 
 @end
 

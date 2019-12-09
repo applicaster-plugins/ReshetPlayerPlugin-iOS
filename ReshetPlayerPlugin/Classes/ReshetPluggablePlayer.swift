@@ -1,31 +1,30 @@
 //
 // ReshetPluggablePlayer.swift
 //
-//  Created by Avi Levin on 05/07/2018.
+//  Created by Roi Kedarya on 03/12/2019.
 //
 import ApplicasterSDK
 import ZappPlugins
 import UIKit
 
-public class ReshetPluggablePlayer: APPlugablePlayerBase, ZPAppLoadingHookProtocol {
+public class ReshetPluggablePlayer: APPlugablePlayerDefault, ZPAppLoadingHookProtocol {
     
-    //var playerControlsView: APPlayerControls?
     var serverTimeUrl: String?
-    var playerViewController: ReshetPlayerViewController?
+    //var playerViewController: ReshetPlayerViewController?
     var currentPlayableItem: ZPPlayable?
     
     public required override init() { }
 
     public required init(configurationJSON: NSDictionary?) { }
     
-    public static func pluggablePlayerInit(playableItem item: ZPPlayable?) -> ZPPlayerProtocol?{
+    public override static func pluggablePlayerInit(playableItem item: ZPPlayable?) -> ZPPlayerProtocol?{
         if let item = item {
             return self.pluggablePlayerInit(playableItems: [item])
         }
         return nil
     }
     
-    open class func pluggablePlayerInit(playableItems items: [ZPPlayable]?, configurationJSON: NSDictionary? = nil) -> ZPPlayerProtocol?{
+    open override class func pluggablePlayerInit(playableItems items: [ZPPlayable]?, configurationJSON: NSDictionary? = nil) -> ZPPlayerProtocol?{
         let instance = ReshetPluggablePlayer()
         instance.currentPlayableItems = items
         instance.currentPlayableItem = items?.first
@@ -55,19 +54,20 @@ public class ReshetPluggablePlayer: APPlugablePlayerBase, ZPAppLoadingHookProtoc
         return instance;
     }
     
-//    public override func presentPlayerFullScreen(_ rootViewController: UIViewController, configuration: ZPPlayerConfiguration?, completion: (() -> Void)?) {
-//        super .presentPlayerFullScreen(rootViewController, configuration: configuration) {
-//            if let playerViewController = self.playerViewController {
-//                playerViewController.controls = playerViewController.reshetPlayerControls()
-//            }
-//        }
-//    }
-    
     public override func presentPlayerFullScreen(_ rootViewController: UIViewController, configuration: ZPPlayerConfiguration?) {
         super .presentPlayerFullScreen(rootViewController, configuration: configuration)
         if let playerViewController = self.playerViewController {
-            playerViewController.controls = playerViewController.reshetPlayerControls()
+            playerViewController.currentPlayerDisplayMode = APPlayerViewControllerDisplayMode.fullScreen
+            playerViewController.controls = ReshetPlayerControlsView.playerControls() //playerViewController.reshetPlayerControls()
             addObserver()
+        }
+    }
+    
+    public override func pluggablePlayerAddInline(_ rootViewController: UIViewController, container: UIView) {
+        super .pluggablePlayerAddInline(rootViewController, container: container)
+        if let playerViewController = self.playerViewController {
+            playerViewController.currentPlayerDisplayMode = APPlayerViewControllerDisplayMode.inline
+            playerViewController.controls = ReshetInlinePlayerControlsView.playerControls()//playerViewController.reshetInlinePlayerControls()
         }
     }
     
@@ -155,9 +155,9 @@ public class ReshetPluggablePlayer: APPlugablePlayerBase, ZPAppLoadingHookProtoc
         return ReshetPluggablePlayer.pluggablePlayerType()
     }
     
-    public static func pluggablePlayerType() -> ZPPlayerType {
-        return .undefined
-    }
+//    public static func pluggablePlayerType() -> ZPPlayerType {
+//        return .undefined
+//    }
     
 }
 

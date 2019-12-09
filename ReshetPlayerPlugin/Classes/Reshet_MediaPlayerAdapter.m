@@ -2,7 +2,7 @@
 //  Reshet_MediaPlayerAdapter.m
 //  KMA_SpringStreams
 //
-//  Created by Frank Kammann on 26.08.11.
+//  Created by Roi kedarya on 09/12/2019.
 //  Copyright 2011 spring GmbH & Co. KG. All rights reserved.
 //
 

@@ -1,12 +1,12 @@
 //
-//  ArtiPlayer.m
-//  ArtiMediaPlayer
+//  ReshetPlayerViewController.m
 //
-//  Created by Avi Levin on 05/07/2018.
+//  Created by Roi kedarya on 09/12/2019.
 //
 
 #import "ReshetPlayerViewController.h"
 #import "ReshetPlayerControlsView.h"
+#import "ReshetInlinePlayerControlsView.h"
 #import "ArtiSDK/AMSDK.h"
 #import "KMA_SpringStreams.h"
 
@@ -54,7 +54,7 @@
 
 @implementation ReshetPlayerViewController
 
-//@synthesize configurationJSON;
+@synthesize configurationJSON;
 
 #pragma mark - Player Life Cycle Methods
 - (void)viewWillAppear:(BOOL)animated {
@@ -120,9 +120,21 @@
     }
 }
 
-- (void)viewDidLoad {
-    [super viewDidLoad];
-    [self setControls:[self reshetPlayerControls]];
+- (void)changeDisplayMode:(APPlayerViewControllerDisplayMode)targetDisplayMode {
+    [super changeDisplayMode:targetDisplayMode];
+    switch (targetDisplayMode) {
+        case APPlayerViewControllerDisplayModeInline:
+            [self setControls:[ReshetInlinePlayerControlsView playerControls]];
+            break;
+        case APPlayerViewControllerDisplayModeFullScreen:
+            if (self.currentPlayerDisplayMode == APPlayerViewControllerDisplayModeInline) {
+                [self setControls:[ReshetPlayerControlsView playerControls]];
+            }
+            break;
+        default:
+            break;
+    }
+
 }
 
 - (void)setControls:(UIView<APPlayerControls> *)controls {
@@ -204,7 +216,6 @@
             shouldShowAdsOnPayedItems = NO;
         }
         [self ConfigureKantarAdapter];
-//        self.playerController.controls = [self reshetPlayerControls];
     }
     _currentlyPlayingItem = items.firstObject;
     _queuePlayer = self.playerController.player;
@@ -212,13 +223,6 @@
     _KantarMediaSiteName = [dictionary objectForKey:@"kantar_site_key"];
     [self setDelta];
     
-    return self;
-}
-
-- (id)initWithPlayableItems:(NSArray *)items {
-//    if (self = [super initWithPlayableItems:items]) {
-//        self.controls = [self reshetPlayerControls];
-//    }
     return self;
 }
 
@@ -704,12 +708,19 @@
     }
 }
 
-- (UIView<APPlayerControls> *)reshetPlayerControls
-{
-    return [[NSBundle bundleForClass:self.class] loadNibNamed:@"ReshetPlayerControlsView"
-                                                        owner:self
-                                                      options:nil].firstObject;
-}
+//- (UIView<APPlayerControls> *)reshetPlayerControls
+//{
+//    return [[NSBundle bundleForClass:self.class] loadNibNamed:@"ReshetPlayerControlsView"
+//                                                        owner:self
+//                                                      options:nil].firstObject;
+//}
+//
+//- (UIView<APPlayerControls> *)reshetInlinePlayerControls
+//{
+//    return [[NSBundle bundleForClass:self.class] loadNibNamed:@"ReshetInlinePlayerControlsView"
+//                                                        owner:self
+//                                                      options:nil].firstObject;
+//}
 
 #pragma mark - Timer hack
 -(void)onTick:(NSTimer*)timer

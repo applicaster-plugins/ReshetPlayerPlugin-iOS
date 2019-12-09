@@ -22,7 +22,7 @@
                         <constraint firstAttribute="height" constant="48" id="NR8-O1-RCz"/>
                     </constraints>
                 </imageView>
-                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" adjustsImageWhenHighlighted="NO" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="8V3-xW-l6C" userLabel="Button - Done">
+                <button hidden="YES" opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" adjustsImageWhenHighlighted="NO" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="8V3-xW-l6C" userLabel="Button - Done">
                     <rect key="frame" x="0.0" y="0.0" width="48" height="48"/>
                     <constraints>
                         <constraint firstAttribute="height" constant="48" id="BoG-w6-ZDu"/>
@@ -198,9 +198,6 @@
                     <inset key="insetFor6xAndEarlier" minX="0.0" minY="-4" maxX="0.0" maxY="4"/>
                     <color key="minimumTrackTintColor" red="0.85490196080000003" green="0.094117647060000004" blue="0.53333333329999999" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                     <color key="maximumTrackTintColor" red="0.72941176470000002" green="0.73725490199999999" blue="0.76470588240000004" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-                    <connections>
-                        <outlet property="delegate" destination="34S-Pe-ijh" id="aV4-Uq-xqr"/>
-                    </connections>
                 </slider>
                 <imageView userInteractionEnabled="NO" contentMode="scaleToFill" image="player_controls_record_time_background.png" translatesAutoresizingMaskIntoConstraints="NO" id="j0q-rB-9Ab" userLabel="Image View - RecordTime">
                     <rect key="frame" x="949" y="56" width="69" height="30"/>
@@ -280,7 +277,7 @@
                 <outlet property="recordTimeBackgroundImageView" destination="j0q-rB-9Ab" id="gCI-mo-WP0"/>
                 <outlet property="recordTimeLabel" destination="MSG-yq-pNR" id="0Zs-mi-ddB"/>
                 <outlet property="scrubbingLabel" destination="DVm-gp-enf" id="FW6-o6-wB6"/>
-                <outlet property="seekSlider" destination="x5M-Dn-uGh" id="Q7t-z6-q1I"/>
+                <outlet property="seekSlider" destination="x5M-Dn-uGh" id="nSM-kR-edB"/>
                 <outlet property="shrinkButton" destination="ZYD-Gc-CIW" id="djc-LE-WGu"/>
                 <outlet property="stopButton" destination="8V3-xW-l6C" id="cks-JZ-88q"/>
                 <outlet property="subtitlesButton" destination="SB7-fG-R6a" id="25f-iK-d0s"/>

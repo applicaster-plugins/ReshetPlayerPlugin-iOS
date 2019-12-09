@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="14490.70" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+    <device id="retina4_7" orientation="landscape">
+        <adaptation id="fullscreen"/>
+    </device>
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="14490.49"/>
+        <capability name="Safe area layout guides" minToolsVersion="9.0"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <view contentMode="scaleToFill" id="iN0-l3-epB" customClass="ReshetInlinePlayerControlsView">
+            <rect key="frame" x="0.0" y="0.0" width="667" height="375"/>
+            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+            <subviews>
+                <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="gTZ-4b-pRt" customClass="APUnhittableView">
+                    <rect key="frame" x="0.0" y="0.0" width="667" height="375"/>
+                    <subviews>
+                        <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="5FD-gC-TiW" customClass="APGradientView">
+                            <rect key="frame" x="0.0" y="0.0" width="667" height="50"/>
+                            <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
+                            <constraints>
+                                <constraint firstAttribute="height" constant="50" id="GLV-dm-K4L"/>
+                            </constraints>
+                        </view>
+                        <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="xax-az-gRL" customClass="APGradientView">
+                            <rect key="frame" x="0.0" y="325" width="667" height="50"/>
+                            <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
+                            <constraints>
+                                <constraint firstAttribute="height" relation="greaterThanOrEqual" constant="50" id="PFo-9q-WqF"/>
+                                <constraint firstAttribute="height" constant="50" id="SR7-9d-hrI"/>
+                            </constraints>
+                        </view>
+                        <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="jbS-Bg-v4g" userLabel="Native Share Button">
+                            <rect key="frame" x="623" y="0.0" width="44" height="44"/>
+                            <constraints>
+                                <constraint firstAttribute="height" constant="44" id="GBy-PG-40Y"/>
+                                <constraint firstAttribute="width" constant="44" id="nz9-x7-lib"/>
+                            </constraints>
+                            <state key="normal" image="inline_player_share_button.png"/>
+                        </button>
+                        <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="yjL-vO-2Jm" userLabel="Fullscreen Button">
+                            <rect key="frame" x="623" y="331" width="44" height="44"/>
+                            <constraints>
+                                <constraint firstAttribute="height" constant="44" id="aKU-31-gzu"/>
+                                <constraint firstAttribute="width" constant="44" id="mov-to-qFu"/>
+                            </constraints>
+                            <state key="normal" image="inline_player_FullScreen_button.png"/>
+                        </button>
+                        <button hidden="YES" opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="bXq-q3-mnY" userLabel="Play Button">
+                            <rect key="frame" x="311.5" y="165.5" width="44" height="44"/>
+                            <constraints>
+                                <constraint firstAttribute="width" constant="44" id="dRT-YO-Bz3"/>
+                                <constraint firstAttribute="height" constant="44" id="tyt-dK-R9n"/>
+                            </constraints>
+                            <state key="normal" image="inline_player_play_button.png"/>
+                        </button>
+                        <button hidden="YES" opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="0ea-mf-aHV" userLabel="Pause Button">
+                            <rect key="frame" x="311.5" y="165.5" width="44" height="44"/>
+                            <constraints>
+                                <constraint firstAttribute="width" constant="44" id="Uxh-lK-H6A"/>
+                                <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="44" id="ceN-jp-a3t"/>
+                                <constraint firstAttribute="height" relation="greaterThanOrEqual" constant="44" id="e6T-Eu-P1y"/>
+                                <constraint firstAttribute="height" constant="44" id="wiI-gr-8Xp"/>
+                            </constraints>
+                            <state key="normal" image="inline_player_pause_button.png"/>
+                        </button>
+                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="DXc-Nd-mRj" userLabel="Current Time Label">
+                            <rect key="frame" x="9" y="364" width="0.0" height="0.0"/>
+                            <fontDescription key="fontDescription" type="system" pointSize="12"/>
+                            <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                            <nil key="highlightedColor"/>
+                        </label>
+                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="H5F-OW-lPh" userLabel="Total Time Label">
+                            <rect key="frame" x="571" y="364" width="0.0" height="0.0"/>
+                            <fontDescription key="fontDescription" type="system" pointSize="12"/>
+                            <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                            <nil key="highlightedColor"/>
+                        </label>
+                        <slider opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" value="0.5" minValue="0.0" maxValue="1" translatesAutoresizingMaskIntoConstraints="NO" id="86S-lF-i8F" customClass="APSlider">
+                            <rect key="frame" x="15" y="341" width="550" height="31"/>
+                            <color key="minimumTrackTintColor" red="0.78431372549019607" green="0.78431372549019607" blue="0.78431372549019607" alpha="1" colorSpace="calibratedRGB"/>
+                            <color key="maximumTrackTintColor" white="0.33333333333333331" alpha="0.5" colorSpace="calibratedWhite"/>
+                            <color key="thumbTintColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                        </slider>
+                        <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="nit-6E-SU8" customClass="MPVolumeView">
+                            <rect key="frame" x="579" y="331" width="44" height="44"/>
+                            <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
+                            <constraints>
+                                <constraint firstAttribute="width" constant="44" id="QKN-RI-6Zd"/>
+                                <constraint firstAttribute="height" constant="44" id="dgw-Xv-XrS"/>
+                            </constraints>
+                        </view>
+                    </subviews>
+                    <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
+                    <constraints>
+                        <constraint firstAttribute="bottom" secondItem="DXc-Nd-mRj" secondAttribute="bottom" constant="11" id="1hM-fP-OpR"/>
+                        <constraint firstItem="0ea-mf-aHV" firstAttribute="centerY" secondItem="gTZ-4b-pRt" secondAttribute="centerY" id="2Yd-Al-1bj"/>
+                        <constraint firstItem="jbS-Bg-v4g" firstAttribute="top" secondItem="gTZ-4b-pRt" secondAttribute="top" id="3ft-Lg-vmm"/>
+                        <constraint firstItem="86S-lF-i8F" firstAttribute="leading" secondItem="DXc-Nd-mRj" secondAttribute="trailing" constant="8" id="BWd-xb-2KK"/>
+                        <constraint firstItem="H5F-OW-lPh" firstAttribute="leading" secondItem="86S-lF-i8F" secondAttribute="trailing" constant="8" id="BzV-49-2yA"/>
+                        <constraint firstItem="DXc-Nd-mRj" firstAttribute="leading" secondItem="gTZ-4b-pRt" secondAttribute="leading" constant="9" id="F4T-V0-9KP"/>
+                        <constraint firstAttribute="trailing" secondItem="jbS-Bg-v4g" secondAttribute="trailing" id="Ggh-Bb-GYD"/>
+                        <constraint firstAttribute="bottom" secondItem="yjL-vO-2Jm" secondAttribute="bottom" id="Ip4-c7-uDM"/>
+                        <constraint firstItem="yjL-vO-2Jm" firstAttribute="leading" secondItem="nit-6E-SU8" secondAttribute="trailing" id="JyG-p6-yYa"/>
+                        <constraint firstAttribute="trailing" secondItem="xax-az-gRL" secondAttribute="trailing" id="M2Z-ze-pi2"/>
+                        <constraint firstItem="0ea-mf-aHV" firstAttribute="centerX" secondItem="gTZ-4b-pRt" secondAttribute="centerX" id="Qhl-Cl-2U5"/>
+                        <constraint firstAttribute="bottom" secondItem="H5F-OW-lPh" secondAttribute="bottom" constant="11" id="VUi-Mp-zoa"/>
+                        <constraint firstAttribute="bottom" secondItem="86S-lF-i8F" secondAttribute="bottom" constant="4" id="Zw9-r4-Mnq"/>
+                        <constraint firstAttribute="bottom" secondItem="nit-6E-SU8" secondAttribute="bottom" id="bQx-4b-iwB"/>
+                        <constraint firstAttribute="trailing" secondItem="5FD-gC-TiW" secondAttribute="trailing" id="fhh-KW-d6T"/>
+                        <constraint firstItem="5FD-gC-TiW" firstAttribute="top" secondItem="gTZ-4b-pRt" secondAttribute="top" id="gIZ-hb-X1E"/>
+                        <constraint firstItem="nit-6E-SU8" firstAttribute="leading" secondItem="H5F-OW-lPh" secondAttribute="trailing" constant="8" id="j3F-ep-ykw"/>
+                        <constraint firstItem="bXq-q3-mnY" firstAttribute="centerY" secondItem="gTZ-4b-pRt" secondAttribute="centerY" id="k86-pN-Ade"/>
+                        <constraint firstAttribute="trailing" secondItem="yjL-vO-2Jm" secondAttribute="trailing" id="lZq-pi-itT"/>
+                        <constraint firstItem="bXq-q3-mnY" firstAttribute="centerX" secondItem="gTZ-4b-pRt" secondAttribute="centerX" id="muj-Ns-tbH"/>
+                        <constraint firstItem="xax-az-gRL" firstAttribute="leading" secondItem="gTZ-4b-pRt" secondAttribute="leading" id="pPQ-SF-dpq"/>
+                        <constraint firstItem="5FD-gC-TiW" firstAttribute="leading" secondItem="gTZ-4b-pRt" secondAttribute="leading" id="uOC-qu-KhD"/>
+                        <constraint firstAttribute="bottom" secondItem="xax-az-gRL" secondAttribute="bottom" id="vt7-ms-0IC"/>
+                    </constraints>
+                </view>
+            </subviews>
+            <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
+            <constraints>
+                <constraint firstItem="Muj-JP-gfM" firstAttribute="bottom" secondItem="gTZ-4b-pRt" secondAttribute="bottom" id="Dyb-Fe-wbH"/>
+                <constraint firstItem="Muj-JP-gfM" firstAttribute="trailing" secondItem="gTZ-4b-pRt" secondAttribute="trailing" id="XiM-Pl-3dc"/>
+                <constraint firstItem="gTZ-4b-pRt" firstAttribute="leading" secondItem="Muj-JP-gfM" secondAttribute="leading" id="alt-36-Wwi"/>
+                <constraint firstItem="gTZ-4b-pRt" firstAttribute="top" secondItem="Muj-JP-gfM" secondAttribute="top" id="dr8-WH-Ofc"/>
+            </constraints>
+            <nil key="simulatedStatusBarMetrics"/>
+            <viewLayoutGuide key="safeArea" id="Muj-JP-gfM"/>
+            <connections>
+                <outlet property="bottomGradientView" destination="xax-az-gRL" id="5JT-k2-V5M"/>
+                <outlet property="currentTimeLabel" destination="DXc-Nd-mRj" id="0xC-x3-Ghd"/>
+                <outlet property="expandButton" destination="yjL-vO-2Jm" id="5Qq-QO-0OU"/>
+                <outlet property="nativeShareButton" destination="jbS-Bg-v4g" id="R17-Si-ciK"/>
+                <outlet property="pauseButton" destination="0ea-mf-aHV" id="Dud-Jr-uWh"/>
+                <outlet property="playButton" destination="bXq-q3-mnY" id="8h9-lW-dZY"/>
+                <outlet property="playerControlsContainer" destination="gTZ-4b-pRt" id="dXH-ns-VpW"/>
+                <outlet property="seekSlider" destination="86S-lF-i8F" id="MiH-Lu-a1J"/>
+                <outlet property="topGradientView" destination="5FD-gC-TiW" id="G7o-20-H6l"/>
+                <outlet property="totalTimeLabel" destination="H5F-OW-lPh" id="rdl-4y-uiR"/>
+                <outlet property="volumeView" destination="nit-6E-SU8" id="vXh-IR-hIA"/>
+            </connections>
+            <point key="canvasLocation" x="-193.5" y="-56.5"/>
+        </view>
+    </objects>
+    <resources>
+        <image name="inline_player_FullScreen_button.png" width="44" height="44"/>
+        <image name="inline_player_pause_button.png" width="44" height="44"/>
+        <image name="inline_player_play_button.png" width="44" height="44"/>
+        <image name="inline_player_share_button.png" width="44" height="44"/>
+    </resources>
+</document>
