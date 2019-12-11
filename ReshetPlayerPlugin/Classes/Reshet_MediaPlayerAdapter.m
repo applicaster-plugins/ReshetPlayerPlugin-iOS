@@ -60,6 +60,12 @@
 -(BOOL) isCastingEnabled{
     return NO;
 }
+
+- (void)dealloc
+{
+    _playerVC = nil;
+    _meta = nil;
+}
 @end
 
 

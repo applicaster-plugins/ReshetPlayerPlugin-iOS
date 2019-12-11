@@ -15,13 +15,17 @@
 @interface ReshetPlayerViewController : APPlayerViewController
 
 @property (nonatomic, strong) NSDictionary* artiParams;
+@property (nonatomic, strong) APQueuePlayer *queuePlayer;
+//@property (nonatomic, strong) UIView<APPlayerControls> *controls;
 
 - (instancetype)initWithPlayableItems:(NSArray*)items withArtiMediaParams:(NSDictionary *)dictionary;
 
 - (void)setControls:(UIView<APPlayerControls> *)controls;
 
-//- (UIView<APPlayerControls> *)reshetPlayerControls;
-//
-//- (UIView<APPlayerControls> *)reshetInlinePlayerControls;
+- (BOOL)isDVRSupported;
+
+- (UIView<APPlayerControls> *)reshetPlayerControls;
+
+- (UIView<APPlayerControls> *)reshetInlinePlayerControls;
 
 @end

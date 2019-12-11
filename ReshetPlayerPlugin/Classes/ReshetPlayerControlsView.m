@@ -29,7 +29,7 @@
     [self setStylesForControls];
 }
 
-- (void)customizeSeekSliderView:(UISlider *)slider
+- (void)customizeSeekSliderView:(ReshetSlider *)slider
 {
     slider.minimumTrackTintColor = [ZAAppConnector.sharedInstance.layoutsStylesDelegate styleColorForKey:@"PlayerControlsViewSliderMinimumTintColor"];
     slider.minimumTrackTintColor = [ZAAppConnector.sharedInstance.layoutsStylesDelegate styleColorForKey:@"PlayerControlsViewSliderMaximumTintColor"];
@@ -84,11 +84,11 @@
     self.seekSlider.isLive = isLive;
 }
 
-+ (UIView<APPlayerControls> *)playerControls
-{
-    return [[NSBundle bundleForClass:self.class] loadNibNamed:@"ReshetPlayerControlsView"
-                                                        owner:self
-                                                      options:nil].firstObject;
-}
+//+ (UIView<APPlayerControls> *)playerControls
+//{
+//    return [[NSBundle bundleForClass:self.class] loadNibNamed:@"ReshetPlayerControlsView"
+//                                                        owner:self
+//                                                      options:nil].firstObject;
+//}
 
 @end

@@ -14,7 +14,7 @@
 @interface ReshetInlinePlayerControlsView ()
 @property (nonatomic, assign) BOOL animatingControlsFade;
 @property (nonatomic, assign) BOOL playerControlsContainerHidden;
-@property (nonatomic, strong) NSDictionary *playingItemInfo;
+//@property (nonatomic, strong) NSDictionary *playingItemInfo;
 
 @end
 
@@ -142,10 +142,10 @@
     self.currentTimeLabel.text = [NSString timeCodeWithSeconds:currentTime];
 }
 
-- (void)videoContentDidStartPlayingWithItem:(NSDictionary *)playingItemInfo
-{
-    self.playingItemInfo = playingItemInfo;
-}
+//- (void)videoContentDidStartPlayingWithItem:(NSDictionary *)playingItemInfo
+//{
+//    self.playingItemInfo = playingItemInfo;
+//}
 
 -(void)updateControlsForLiveState:(BOOL)isLive
 {
@@ -154,11 +154,11 @@
     self.totalTimeLabel.hidden = isLive;
 }
 
-+ (ReshetInlinePlayerControlsView *)playerControls
-{
-    return [[NSBundle bundleForClass:self.class] loadNibNamed:@"ReshetInlinePlayerControlsView"
-                                                        owner:self
-                                                      options:nil].firstObject;
-}
+//+ (ReshetInlinePlayerControlsView *)playerControls
+//{
+//    return [[NSBundle bundleForClass:self.class] loadNibNamed:@"ReshetInlinePlayerControlsView"
+//                                                        owner:self
+//                                                      options:nil].firstObject;
+//}
 
 @end

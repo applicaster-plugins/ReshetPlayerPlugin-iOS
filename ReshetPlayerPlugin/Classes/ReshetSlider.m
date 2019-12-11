@@ -15,30 +15,42 @@
 
 @implementation ReshetSlider
 
+@synthesize delegate;
+
 - (void)awakeFromNib {
     [super awakeFromNib];
+    //[super setMaximumValue: 28800];
 }
 
 
 - (void)setMaximumValue:(float)maximumValue {
-//    if (self.isLive) {
-     APLoggerDebug(@"slider maximum value is in %f", maximumValue);
+    NSLog(@"\n\n💙💙💙💙  slider maximum value is in %f  💙💙💙💙\n\n", maximumValue);
     if ([self.delegate respondsToSelector:@selector(setSliderForDVRSupport)]) {
         [self.delegate setSliderForDVRSupport];
     }
-//    } else {
-//        [super setMaximumValue:maximumValue];
-//    }
 }
 
 - (void)setValue:(float)value {
-    APLoggerDebug(@"slider time is in %f", value);
+    NSLog(@"\n\n💛💛💛💛  slider time is %f  💛💛💛💛\n\n", value);
     [super setValue:value];
 }
 
 - (void)setMinimumValue:(float)minimumValue {
-    APLoggerDebug(@"slider minimum value is in %f", minimumValue);
+    NSLog(@"\n\n💜💜💜💜  slider minimum value is in %f  💜💜💜💜\n\n", minimumValue);
     [super setMinimumValue:minimumValue];
+}
+
+- (void)setInitialValuesWith:(CMTimeRange)timeRange {
+    CGFloat maximumValue = CMTimeGetSeconds(timeRange.duration);
+    [super setMaximumValue:maximumValue];
+    CGFloat minimumValue = CMTimeGetSeconds(timeRange.start);
+    [super setMinimumValue:minimumValue];
+    
+}
+
+- (void)dealloc
+{
+    delegate = nil;
 }
 
 @end

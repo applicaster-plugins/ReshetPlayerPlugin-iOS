@@ -17,9 +17,12 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, weak) IBOutlet MPVolumeView *volumeView;
 @property (weak, nonatomic) IBOutlet UIView *chromecastButton;
 
+//- (void)sliderTimeFrame;
+
+
 - (void)setSliderForDVRSupport;
 
-+ (UIView<APPlayerControls> *)playerControls;
+//+ (UIView<APPlayerControls> *)playerControls;
 
 @end
 

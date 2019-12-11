@@ -7,24 +7,24 @@ import ApplicasterSDK
 import ZappPlugins
 import UIKit
 
-public class ReshetPluggablePlayer: APPlugablePlayerDefault, ZPAppLoadingHookProtocol {
+public class ReshetPluggablePlayer: APPlugablePlayerBase, ZPAppLoadingHookProtocol {
     
     var serverTimeUrl: String?
-    //var playerViewController: ReshetPlayerViewController?
+    var playerViewController: ReshetPlayerViewController?
     var currentPlayableItem: ZPPlayable?
     
     public required override init() { }
 
     public required init(configurationJSON: NSDictionary?) { }
     
-    public override static func pluggablePlayerInit(playableItem item: ZPPlayable?) -> ZPPlayerProtocol?{
+    public static func pluggablePlayerInit(playableItem item: ZPPlayable?) -> ZPPlayerProtocol?{
         if let item = item {
             return self.pluggablePlayerInit(playableItems: [item])
         }
         return nil
     }
     
-    open override class func pluggablePlayerInit(playableItems items: [ZPPlayable]?, configurationJSON: NSDictionary? = nil) -> ZPPlayerProtocol?{
+    open class func pluggablePlayerInit(playableItems items: [ZPPlayable]?, configurationJSON: NSDictionary? = nil) -> ZPPlayerProtocol?{
         let instance = ReshetPluggablePlayer()
         instance.currentPlayableItems = items
         instance.currentPlayableItem = items?.first
@@ -58,7 +58,7 @@ public class ReshetPluggablePlayer: APPlugablePlayerDefault, ZPAppLoadingHookPro
         super .presentPlayerFullScreen(rootViewController, configuration: configuration)
         if let playerViewController = self.playerViewController {
             playerViewController.currentPlayerDisplayMode = APPlayerViewControllerDisplayMode.fullScreen
-            playerViewController.controls = ReshetPlayerControlsView.playerControls() //playerViewController.reshetPlayerControls()
+            playerViewController.controls = playerViewController.reshetPlayerControls()
             addObserver()
         }
     }
@@ -67,7 +67,7 @@ public class ReshetPluggablePlayer: APPlugablePlayerDefault, ZPAppLoadingHookPro
         super .pluggablePlayerAddInline(rootViewController, container: container)
         if let playerViewController = self.playerViewController {
             playerViewController.currentPlayerDisplayMode = APPlayerViewControllerDisplayMode.inline
-            playerViewController.controls = ReshetInlinePlayerControlsView.playerControls()//playerViewController.reshetInlinePlayerControls()
+            playerViewController.controls = playerViewController.reshetInlinePlayerControls()
         }
     }
     
@@ -93,7 +93,6 @@ public class ReshetPluggablePlayer: APPlugablePlayerDefault, ZPAppLoadingHookPro
     }
     
     @objc func stop() {
-        
         removeObservers()
         let weakSelf = self
         self.playerViewController?.dismiss(animated: true, completion: {
@@ -116,14 +115,15 @@ public class ReshetPluggablePlayer: APPlugablePlayerDefault, ZPAppLoadingHookPro
     }
     
     func getServerForCurrentTime() {
-        if let serverTimeUrl = serverTimeUrl {
-            APNetworkManager.requestDataObject(forUrlString: serverTimeUrl, method: APNetworkManager.httpMethodGET(), parameters: nil) { (success, responseObject, error, statusCode, textEncodingName) in
-                if let responseObject = responseObject, success == true,
-                    let dateString = String(data: responseObject, encoding: .utf8) {
-                    self.setDeltaFromDateString(serverDateString: dateString)
-                }
+//        if let serverTimeUrl = serverTimeUrl {
+        let serverTimeUrl = "https://13tv.co.il/timestamp.php"
+        APNetworkManager.requestDataObject(forUrlString: serverTimeUrl, method: APNetworkManager.httpMethodGET(), parameters: nil) { (success, responseObject, error, statusCode, textEncodingName) in
+            if let responseObject = responseObject, success == true,
+                let dateString = String(data: responseObject, encoding: .utf8) {
+                self.setDeltaFromDateString(serverDateString: dateString)
             }
         }
+    //        }
     }
     
     func setDeltaFromDateString(serverDateString:String) {
@@ -155,9 +155,9 @@ public class ReshetPluggablePlayer: APPlugablePlayerDefault, ZPAppLoadingHookPro
         return ReshetPluggablePlayer.pluggablePlayerType()
     }
     
-//    public static func pluggablePlayerType() -> ZPPlayerType {
-//        return .undefined
-//    }
+    public static func pluggablePlayerType() -> ZPPlayerType {
+        return .undefined
+    }
     
 }
 

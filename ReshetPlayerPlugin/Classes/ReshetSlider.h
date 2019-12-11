@@ -12,7 +12,12 @@ NS_ASSUME_NONNULL_BEGIN
 @interface ReshetSlider : APSlider
 
 @property (nonatomic, assign) BOOL isLive;
+@property (nonatomic, assign) float timeframe;
 
+- (void)setMaximumValue:(float)maximumValue;
+- (void)setValue:(float)value;
+- (void)setMinimumValue:(float)minimumValue;
+- (void)setInitialValuesWith:(CMTimeRange)timeRange;
 @end
 
 

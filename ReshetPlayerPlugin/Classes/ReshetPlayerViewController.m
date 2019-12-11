@@ -35,7 +35,7 @@
 
 #pragma mark - Kantar variables
 
-@property (nonatomic, strong) NSString *KantarMediaSiteName;
+@property (nonatomic, strong) NSString *kantarMediaSiteName;
 @property (nonatomic, strong) NSMutableDictionary *kantarAttributes;
 @property (nonatomic, strong) KMA_SpringStreams *tracker;
 @property (nonatomic, strong) KMA_Stream *kantarStream;
@@ -47,14 +47,24 @@
 
 @property (nonatomic, strong) id<ZPPlayable> currentlyPlayingItem;
 
-//ReshetPlayerControlsView *controls;
-@property (nonatomic, strong) APQueuePlayer *queuePlayer;
-
 @end
 
 @implementation ReshetPlayerViewController
 
 @synthesize configurationJSON;
+@synthesize controls;
+
+- (void)dealloc
+{
+    [NSNotificationCenter.defaultCenter removeObserver:self];
+    _kantarMediaSiteName = nil;
+    _kantarAttributes = nil;
+    _tracker = nil;
+    _kantarStream = nil;
+    _adapter = nil;
+    [self destroyAMSdk];
+//    self.controls = nil;
+}
 
 #pragma mark - Player Life Cycle Methods
 - (void)viewWillAppear:(BOOL)animated {
@@ -124,11 +134,13 @@
     [super changeDisplayMode:targetDisplayMode];
     switch (targetDisplayMode) {
         case APPlayerViewControllerDisplayModeInline:
-            [self setControls:[ReshetInlinePlayerControlsView playerControls]];
+            self.controls = [self reshetInlinePlayerControls];
+            [self setControls:self.controls];
             break;
         case APPlayerViewControllerDisplayModeFullScreen:
             if (self.currentPlayerDisplayMode == APPlayerViewControllerDisplayModeInline) {
-                [self setControls:[ReshetPlayerControlsView playerControls]];
+                self.controls = [self reshetPlayerControls];
+                [self setControls:self.controls];
             }
             break;
         default:
@@ -151,29 +163,35 @@
         }
         
     }
-//    APSlider *slider = self.controls.seekSlider;
-//    slider.hidden = ![self isDVRSupported];
     if (self.kantarAttributes) {
         [self startKantarMesurment];
     }
-//    if ([self.playerController.player.defaultControls isKindOfClass:[APPlayerControlsView class]]) {
-//        APPlayerControlsView * controls = (APPlayerControlsView *)self.playerController.player.defaultControls;
-//        [controls customizeSeekSliderView:slider];
-//    }
+}
+
+- (void)play {
+    [super play];
+    if (self.queuePlayer.player.currentItem.seekableTimeRanges.isNotEmpty) {
+        //self.ReshetPlayerControlsView
+        CMTimeRange seekableRanges = [self.queuePlayer.player.currentItem.seekableTimeRanges.lastObject CMTimeRangeValue];
+        if ([self.controls isKindOfClass:[ReshetPlayerControlsView class]]) {
+            [((ReshetPlayerControlsView *)self.controls).seekSlider setInitialValuesWith:seekableRanges];
+        }
+        NSLog(@"\n\n💜💜💜💜  PLAYING  💜💜💜💜\n\n");
+    }
 }
 
 - (BOOL)isDVRSupported {
 
     BOOL retVal = NO;
-    NSURL *CurrentlyPlayingUrl = [self CurrentlyPlayingUrl];
+    NSURL *CurrentlyPlayingUrl = self.currentlyPlayingItem.assetUrl.URL;//[self CurrentlyPlayingUrl];
     retVal = ([[CurrentlyPlayingUrl absoluteString] containsString:@"DVR"]);
-    return retVal;
+    return YES;//retVal;
 }
 
--(NSURL *)CurrentlyPlayingUrl {
-    AVAsset *currentPlayerAsset = self.queuePlayer.player.currentItem.asset;
-    return [currentPlayerAsset isKindOfClass:AVURLAsset.class] ? [(AVURLAsset *)currentPlayerAsset URL] : nil;
-}
+//-(NSURL *)CurrentlyPlayingUrl {
+//    AVAsset *currentPlayerAsset = self.queuePlayer.player.currentItem.asset;
+//    return [currentPlayerAsset isKindOfClass:AVURLAsset.class] ? [(AVURLAsset *)currentPlayerAsset URL] : nil;
+//}
 
 - (void)viewWillDisappear:(BOOL)animated {
     
@@ -220,7 +238,7 @@
     _currentlyPlayingItem = items.firstObject;
     _queuePlayer = self.playerController.player;
     _cutTime = [dictionary objectForKey:@"c1_cut_time"];
-    _KantarMediaSiteName = [dictionary objectForKey:@"kantar_site_key"];
+    _kantarMediaSiteName = [dictionary objectForKey:@"kantar_site_key"];
     [self setDelta];
     
     return self;
@@ -238,7 +256,7 @@
 
 - (void)ConfigureKantarAdapter {
     NSString *appDisplayName = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleDisplayName"];
-    //self.tracker = [KMA_SpringStreams getInstance:_KantarMediaSiteName a:appDisplayName];
+    //self.tracker = [KMA_SpringStreams getInstance:_kantarMediaSiteName a:appDisplayName];
     //self.adapter = [[Reshet_MediaPlayerAdapter alloc] adapter:self];
     self.kantarAttributes = [[NSMutableDictionary alloc] init];
 //    NSString *width = [NSString stringWithFormat:@"%d",[self.adapter getWidth]];
@@ -708,19 +726,19 @@
     }
 }
 
-//- (UIView<APPlayerControls> *)reshetPlayerControls
-//{
-//    return [[NSBundle bundleForClass:self.class] loadNibNamed:@"ReshetPlayerControlsView"
-//                                                        owner:self
-//                                                      options:nil].firstObject;
-//}
-//
-//- (UIView<APPlayerControls> *)reshetInlinePlayerControls
-//{
-//    return [[NSBundle bundleForClass:self.class] loadNibNamed:@"ReshetInlinePlayerControlsView"
-//                                                        owner:self
-//                                                      options:nil].firstObject;
-//}
+- (UIView<APPlayerControls> *)reshetPlayerControls
+{
+    return [[NSBundle bundleForClass:self.class] loadNibNamed:@"ReshetPlayerControlsView"
+                                                        owner:self
+                                                      options:nil].firstObject;
+}
+
+- (UIView<APPlayerControls> *)reshetInlinePlayerControls
+{
+    return [[NSBundle bundleForClass:self.class] loadNibNamed:@"ReshetInlinePlayerControlsView"
+                                                        owner:self
+                                                      options:nil].firstObject;
+}
 
 #pragma mark - Timer hack
 -(void)onTick:(NSTimer*)timer

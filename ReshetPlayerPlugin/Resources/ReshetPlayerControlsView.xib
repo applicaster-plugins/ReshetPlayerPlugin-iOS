@@ -22,7 +22,7 @@
                         <constraint firstAttribute="height" constant="48" id="NR8-O1-RCz"/>
                     </constraints>
                 </imageView>
-                <button hidden="YES" opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" adjustsImageWhenHighlighted="NO" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="8V3-xW-l6C" userLabel="Button - Done">
+                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" adjustsImageWhenHighlighted="NO" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="8V3-xW-l6C" userLabel="Button - Done">
                     <rect key="frame" x="0.0" y="0.0" width="48" height="48"/>
                     <constraints>
                         <constraint firstAttribute="height" constant="48" id="BoG-w6-ZDu"/>
