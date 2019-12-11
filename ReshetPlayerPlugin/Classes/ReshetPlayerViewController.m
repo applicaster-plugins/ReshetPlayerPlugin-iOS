@@ -44,14 +44,14 @@
 @property (nonatomic, assign) BOOL didSetDeltaInStorage;
 @property (nonatomic, assign) NSTimeInterval delta;
 @property (nonatomic, strong) NSString *cutTime;
-
+@property (nonatomic, strong) NSString *timeFormat;
 @property (nonatomic, strong) id<ZPPlayable> currentlyPlayingItem;
+@property (nonatomic, strong) NSString *liveStreamUrl;
 
 @end
 
 @implementation ReshetPlayerViewController
 
-@synthesize configurationJSON;
 @synthesize controls;
 
 - (void)dealloc
@@ -125,7 +125,8 @@
         APAtomEntry *atomEntry = ((APAtomEntryPlayable *)self.currentlyPlayingItem).atomEntry;
         BOOL isInFrame = [self isAtomItem:atomEntry InTimeFrame:self.cutTime];
         if (isInFrame) {
-            
+            //play live string
+            // TO DO
         }
     }
 }
@@ -188,11 +189,6 @@
     return YES;//retVal;
 }
 
-//-(NSURL *)CurrentlyPlayingUrl {
-//    AVAsset *currentPlayerAsset = self.queuePlayer.player.currentItem.asset;
-//    return [currentPlayerAsset isKindOfClass:AVURLAsset.class] ? [(AVURLAsset *)currentPlayerAsset URL] : nil;
-//}
-
 - (void)viewWillDisappear:(BOOL)animated {
     
     if([self shouldDisplayAds] && ![self ignoreAdsOnChangeMode]) {
@@ -239,6 +235,8 @@
     _queuePlayer = self.playerController.player;
     _cutTime = [dictionary objectForKey:@"c1_cut_time"];
     _kantarMediaSiteName = [dictionary objectForKey:@"kantar_site_key"];
+    self.timeFormat = @"yyyy-MM-dd'T'HH:mm:ssZ";
+    self.liveStreamUrl = dictionary["live_stream_url"];
     [self setDelta];
     
     return self;
@@ -693,38 +691,66 @@
   time frame is the number of hours for the c+1 time frame as defined by kantar.
   if we have an atomEntry - check it's starting time to see if it is in the time frame of c+1
  */
-- (BOOL)isAtomItem:(APAtomEntry *)atomEntry InTimeFrame:(NSString *)cutTime {
+- (BOOL)isAtomItem:(APAtomEntry *)atomEntry InTimeFrame:(NSString *)cutTimeString {
     BOOL retVal = NO;
-    NSString *broadcastTime = [atomEntry.extensions objectForKey:@"video_start_time"];
-//    NSDate *now = [NSDate date];
-//    NSTimeInterval timeInSeconds = [now NSTimeIntervalSince1970];
-//    NSDate *serverTime = now + self.delta;
+    id broadcastTimeInMiliSec = ([atomEntry.extensions objectForKey:@"video_start_time"]);
+    NSString *windowTimeFrameString = self.artiParams[@"c1_window_length_time"];
+    if ([broadcastTimeInMiliSec isKindOfClass:[NSNumber class]] && windowTimeFrameString.isNotEmptyOrWhiteSpaces) {
+        double broadcastTimeSec = ((NSNumber *)broadcastTimeInMiliSec).doubleValue / 1000;
+        double windowTimeFrameSec = [windowTimeFrameString doubleValue] / 1000;
+        NSTimeInterval currentDeviceTime = [[NSDate date] timeIntervalSince1970];
+        NSTimeInterval serverTime = currentDeviceTime + self.delta;
+        BOOL isInTimeFrameWindow = serverTime - broadcastTimeSec < windowTimeFrameSec;
+        if (isInTimeFrameWindow) {
+            NSDate *now = [NSDate dateWithTimeIntervalSince1970:serverTime];
+            double daySeconds = 86400;
+            NSDate *videoStartDate = [NSDate dateWithTimeIntervalSince1970:broadcastTimeSec];
+            NSRange range = [cutTimeString rangeOfString:@":"];
+            NSString *cutTimeHour = [cutTimeString substringToIndex:range.location];
+            NSString *cutTimeMinutes = [cutTimeString substringFromIndex:(range.location + 1)];
+            NSCalendar *calender = [[NSCalendar alloc] initWithCalendarIdentifier:NSCalendarIdentifierGregorian];
+            NSTimeZone *timeZone = [NSTimeZone timeZoneWithName:@"UTC"];
+            calender.timeZone = timeZone;
+            NSDateComponents *timeComponents = [calender components:NSCalendarUnitDay | NSCalendarUnitMonth | NSCalendarUnitYear | NSCalendarUnitHour | NSCalendarUnitMinute fromDate:videoStartDate];
+            
+            [timeComponents setHour:cutTimeHour.intValue];
+            [timeComponents setMinute:cutTimeMinutes.intValue];
+            NSDate *cutTime = [calender dateFromComponents:timeComponents];
+            if ([cutTime timeIntervalSinceDate:videoStartDate] > 0) {
+                [cutTime dateByAddingTimeInterval:daySeconds];
+            } else {
+                [cutTime dateByAddingTimeInterval:(2*daySeconds)];
+            }
+            BOOL isC1 = ([cutTime timeIntervalSinceDate:now] > 0);
+            retVal = isC1;
+        }
+    }
     return retVal;
 }
 
-- (void)reloadUrlForDVRSupport:(UISlider *)slider WithDuration:(CGFloat)duration {
-    // reloads the url to get the latest live stream
-    AVPlayerItem *playerItem = [AVPlayerItem playerItemWithAsset:self.queuePlayer.player.currentItem.asset];
-    [self.queuePlayer.player replaceCurrentItemWithPlayerItem: playerItem];
-    
-    //set slider's new min and max values
-    [slider setMaximumValue: duration];
-    [slider setMinimumValue:0.0];
-    [slider setValue:duration];
-}
-
-- (void)controlsSliderChangeEnded:(id)sender {
-    [super.self.queuePlayer controlsSliderChangeEnded:sender];
-    if ([self isDVRSupported]) { //check for DVR support
-        UISlider *slider = (UISlider *)sender;
-        CMTimeRange seekableRange = [self.queuePlayer.player.currentItem.seekableTimeRanges.lastObject CMTimeRangeValue];
-        CGFloat seekableDuration = CMTimeGetSeconds(seekableRange.duration);
-        BOOL isSliderReachLivePoint = ([slider maximumValue] == [slider value]);
-        if (isSliderReachLivePoint) {
-            [self reloadUrlForDVRSupport:slider WithDuration:seekableDuration];
-        }
-    }
-}
+//- (void)reloadUrlForDVRSupport:(UISlider *)slider WithDuration:(CGFloat)duration {
+//    // reloads the url to get the latest live stream
+//    AVPlayerItem *playerItem = [AVPlayerItem playerItemWithAsset:self.queuePlayer.player.currentItem.asset];
+//    [self.queuePlayer.player replaceCurrentItemWithPlayerItem: playerItem];
+//
+//    //set slider's new min and max values
+//    [slider setMaximumValue: duration];
+//    [slider setMinimumValue:0.0];
+//    [slider setValue:duration];
+//}
+//
+//- (void)controlsSliderChangeEnded:(id)sender {
+//    [super.self.queuePlayer controlsSliderChangeEnded:sender];
+//    if ([self isDVRSupported]) { //check for DVR support
+//        UISlider *slider = (UISlider *)sender;
+//        CMTimeRange seekableRange = [self.queuePlayer.player.currentItem.seekableTimeRanges.lastObject CMTimeRangeValue];
+//        CGFloat seekableDuration = CMTimeGetSeconds(seekableRange.duration);
+//        BOOL isSliderReachLivePoint = ([slider maximumValue] == [slider value]);
+//        if (isSliderReachLivePoint) {
+//            [self reloadUrlForDVRSupport:slider WithDuration:seekableDuration];
+//        }
+//    }
+//}
 
 - (UIView<APPlayerControls> *)reshetPlayerControls
 {
