@@ -19,7 +19,7 @@
     "identifier": "ReshetPlayerPlugin",
     "ui_builder_support": false,
     "dependency_name": "ReshetPlayerPlugin",
-    "dependency_versi on": "0.0.2",
+    "dependency_version": "0.0.2",
     "whitelisted_account_ids": [
         "5891b9f978f9f300171455e5",
         "576fceae636566000f000000"
@@ -97,6 +97,16 @@
             "key": "kantar_attribute_stream_value",
             "placeholder": "i.e live/channelname",
             "tooltip_text": "attribute stream value that will be send to kantar"
+        },
+        {
+            "type": "text",
+            "key": "OVIDIUS_base_url",
+            "tooltip_text": "OVIDIUS api base url"
+        },
+        {
+            "type": "text",
+            "key": "OVIDIUS_user_id",
+            "tooltip_text": "OVIDIUS api user id"
         }
     ]
 }

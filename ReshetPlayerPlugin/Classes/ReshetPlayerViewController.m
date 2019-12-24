@@ -236,7 +236,7 @@
     _cutTime = [dictionary objectForKey:@"c1_cut_time"];
     _kantarMediaSiteName = [dictionary objectForKey:@"kantar_site_key"];
     self.timeFormat = @"yyyy-MM-dd'T'HH:mm:ssZ";
-    self.liveStreamUrl = dictionary["live_stream_url"];
+    self.liveStreamUrl = dictionary[@"live_stream_url"];
     [self setDelta];
     
     return self;
@@ -266,6 +266,12 @@
 //        [self.kantarAttributes setObject:height forKey:@"sy"];
 //    }
 
+}
+
+- (void)replaceSrc:(NSString *)src{
+    APURLPlayable *item  = _currentlyPlayingItem;
+    [item updateStreamUrl:src];
+    _currentlyPlayingItem = item;
 }
 
 - (void) startKantarMesurment {

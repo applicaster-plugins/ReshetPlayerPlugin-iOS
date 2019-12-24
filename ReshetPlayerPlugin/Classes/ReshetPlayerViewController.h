@@ -24,6 +24,8 @@
 
 - (BOOL)isDVRSupported;
 
+-(void)replaceSrc:(NSString *)src;
+
 - (UIView<APPlayerControls> *)reshetPlayerControls;
 
 - (UIView<APPlayerControls> *)reshetInlinePlayerControls;
