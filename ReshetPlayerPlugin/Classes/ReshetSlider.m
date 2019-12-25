@@ -20,6 +20,7 @@
 - (void)awakeFromNib {
     [super awakeFromNib];
     //[super setMaximumValue: 28800];
+    [super setMaximumValue: 32.5 * 3600];
 }
 
 
