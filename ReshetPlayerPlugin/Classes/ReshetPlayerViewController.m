@@ -41,7 +41,7 @@
 @property (nonatomic, strong) KMA_Stream *kantarStream;
 @property (nonatomic, strong) Reshet_MediaPlayerAdapter *adapter;
 @property (nonatomic, assign) NSTimeInterval timeIntervalFromServer;
-@property (nonatomic, assign) BOOL didSetDeltaInStorage;
+@property (nonatomic, assign) BOOL didSwitchStreamToLive;
 @property (nonatomic, assign) NSTimeInterval delta;
 @property (nonatomic, strong) NSString *cutTime;
 @property (nonatomic, strong) NSString *timeFormat;
@@ -63,7 +63,7 @@
     _kantarStream = nil;
     _adapter = nil;
     [self destroyAMSdk];
-//    self.controls = nil;
+    self.controls = nil;
 }
 
 #pragma mark - Player Life Cycle Methods
@@ -121,14 +121,15 @@
         [[NSRunLoop mainRunLoop] addTimer:t forMode:NSRunLoopCommonModes];
     }
     self.lastPlayerDisplayMode = self.currentPlayerDisplayMode;
-    if ([self.currentlyPlayingItem isKindOfClass:[APAtomEntryPlayable class]]) {
-        APAtomEntry *atomEntry = ((APAtomEntryPlayable *)self.currentlyPlayingItem).atomEntry;
-        BOOL isInFrame = [self isAtomItem:atomEntry InTimeFrame:self.cutTime];
-        if (isInFrame) {
-            //play live string
-            // TO DO
-        }
+}
+
+- (AVURLAsset *)assetUrlFromString:(NSString *)urlString {
+    AVURLAsset *assetUrl = nil;
+    NSURL *url = [NSURL URLWithString:urlString];
+    if (url) {
+        assetUrl = [AVURLAsset URLAssetWithURL:url options:nil];
     }
+    return assetUrl;
 }
 
 - (void)changeDisplayMode:(APPlayerViewControllerDisplayMode)targetDisplayMode {
@@ -170,15 +171,35 @@
 }
 
 - (void)play {
-    [super play];
-    if (self.queuePlayer.player.currentItem.seekableTimeRanges.isNotEmpty) {
+    if ([self.currentlyPlayingItem isKindOfClass:[APAtomEntryPlayable class]]) {
+        APAtomEntry *atomEntry = ((APAtomEntryPlayable *)self.currentlyPlayingItem).atomEntry;
+        BOOL isInFrame = [self isAtomItem:atomEntry InTimeFrame:self.cutTime];
+        if (isInFrame) {
+            if (self.liveStreamUrl) {
+                AVURLAsset *urlAsset = [self assetUrlFromString:self.liveStreamUrl];
+                AVPlayerItem *playerItem = [AVPlayerItem playerItemWithAsset:urlAsset];
+                NSArray *timeRanges = playerItem.seekableTimeRanges;
+                NSValue *lastObject = timeRanges.lastObject;
+                [self.queuePlayer setContentUrlAsset:urlAsset];
+                double broadcastTime = [self getEntryStartTime:atomEntry];
+                if (broadcastTime > 0) {
+                    // seek to time
+                    //[self.queuePlayer seekToTime: broadcastTime];
+                    self.didSwitchStreamToLive = YES;
+                }
+                //[super play];
+            }
+        }
+    } else if (self.queuePlayer.player.currentItem.seekableTimeRanges.isNotEmpty && ! self.didSwitchStreamToLive) {
         //self.ReshetPlayerControlsView
         CMTimeRange seekableRanges = [self.queuePlayer.player.currentItem.seekableTimeRanges.lastObject CMTimeRangeValue];
         if ([self.controls isKindOfClass:[ReshetPlayerControlsView class]]) {
-            [((ReshetPlayerControlsView *)self.controls).seekSlider setInitialValuesWith:seekableRanges];
+            //[((ReshetPlayerControlsView *)self.controls).seekSlider setInitialValuesWith:seekableRanges];
+            //[super play];
         }
         NSLog(@"\n\n💜💜💜💜  PLAYING  💜💜💜💜\n\n");
     }
+    [super play];
 }
 
 - (BOOL)isDVRSupported {
@@ -236,7 +257,8 @@
     _cutTime = [dictionary objectForKey:@"c1_cut_time"];
     _kantarMediaSiteName = [dictionary objectForKey:@"kantar_site_key"];
     self.timeFormat = @"yyyy-MM-dd'T'HH:mm:ssZ";
-    self.liveStreamUrl = dictionary["live_stream_url"];
+    self.liveStreamUrl = dictionary[@"live_stream_url"];
+    self.didSwitchStreamToLive = NO;
     [self setDelta];
     
     return self;
@@ -570,6 +592,10 @@
                                              selector:@selector(facebookDialogDidCloseNotification:)
                                                  name:APFacebookFeedDidCloseNotification
                                                object:nil];
+    
+    [controls.seekSlider addTarget:self
+                            action:@selector(controlsSliderChangeEnded:)
+                  forControlEvents:UIControlEventTouchUpInside];
 }
 
 - (void)removeObservers {
@@ -693,10 +719,9 @@
  */
 - (BOOL)isAtomItem:(APAtomEntry *)atomEntry InTimeFrame:(NSString *)cutTimeString {
     BOOL retVal = NO;
-    id broadcastTimeInMiliSec = ([atomEntry.extensions objectForKey:@"video_start_time"]);
+    double broadcastTimeSec = [self getEntryStartTime:atomEntry];
     NSString *windowTimeFrameString = self.artiParams[@"c1_window_length_time"];
-    if ([broadcastTimeInMiliSec isKindOfClass:[NSNumber class]] && windowTimeFrameString.isNotEmptyOrWhiteSpaces) {
-        double broadcastTimeSec = ((NSNumber *)broadcastTimeInMiliSec).doubleValue / 1000;
+    if (broadcastTimeSec && windowTimeFrameString.isNotEmptyOrWhiteSpaces) {
         double windowTimeFrameSec = [windowTimeFrameString doubleValue] / 1000;
         NSTimeInterval currentDeviceTime = [[NSDate date] timeIntervalSince1970];
         NSTimeInterval serverTime = currentDeviceTime + self.delta;
@@ -717,9 +742,9 @@
             [timeComponents setMinute:cutTimeMinutes.intValue];
             NSDate *cutTime = [calender dateFromComponents:timeComponents];
             if ([cutTime timeIntervalSinceDate:videoStartDate] > 0) {
-                [cutTime dateByAddingTimeInterval:daySeconds];
+                cutTime = [cutTime dateByAddingTimeInterval:daySeconds];
             } else {
-                [cutTime dateByAddingTimeInterval:(2*daySeconds)];
+                cutTime = [cutTime dateByAddingTimeInterval:(2*daySeconds)];
             }
             BOOL isC1 = ([cutTime timeIntervalSinceDate:now] > 0);
             retVal = isC1;
@@ -728,29 +753,39 @@
     return retVal;
 }
 
-//- (void)reloadUrlForDVRSupport:(UISlider *)slider WithDuration:(CGFloat)duration {
-//    // reloads the url to get the latest live stream
-//    AVPlayerItem *playerItem = [AVPlayerItem playerItemWithAsset:self.queuePlayer.player.currentItem.asset];
-//    [self.queuePlayer.player replaceCurrentItemWithPlayerItem: playerItem];
-//
-//    //set slider's new min and max values
-//    [slider setMaximumValue: duration];
-//    [slider setMinimumValue:0.0];
-//    [slider setValue:duration];
-//}
-//
-//- (void)controlsSliderChangeEnded:(id)sender {
-//    [super.self.queuePlayer controlsSliderChangeEnded:sender];
-//    if ([self isDVRSupported]) { //check for DVR support
-//        UISlider *slider = (UISlider *)sender;
-//        CMTimeRange seekableRange = [self.queuePlayer.player.currentItem.seekableTimeRanges.lastObject CMTimeRangeValue];
-//        CGFloat seekableDuration = CMTimeGetSeconds(seekableRange.duration);
-//        BOOL isSliderReachLivePoint = ([slider maximumValue] == [slider value]);
-//        if (isSliderReachLivePoint) {
-//            [self reloadUrlForDVRSupport:slider WithDuration:seekableDuration];
-//        }
-//    }
-//}
+- (double)getEntryStartTime:(APAtomEntry *)entry {
+    double broadcastTimeSec = 0;
+    id broadcastTimeInMiliSec = ([entry.extensions objectForKey:@"video_start_time"]);
+    if ([broadcastTimeInMiliSec isKindOfClass:[NSNumber class]]) {
+        broadcastTimeSec = ((NSNumber *)broadcastTimeInMiliSec).doubleValue / 1000;
+    }
+    broadcastTimeSec = 1577074732;
+    return broadcastTimeSec;
+}
+
+- (void)reloadUrlForDVRSupport:(UISlider *)slider WithDuration:(CGFloat)duration {
+    // reloads the url to get the latest live stream
+    AVPlayerItem *playerItem = [AVPlayerItem playerItemWithAsset:self.queuePlayer.player.currentItem.asset];
+    [self.queuePlayer.player replaceCurrentItemWithPlayerItem: playerItem];
+
+    //set slider's new min and max values
+    [slider setMaximumValue: duration];
+    [slider setMinimumValue:0.0];
+    [slider setValue:duration];
+}
+
+- (void)controlsSliderChangeEnded:(id)sender {
+    [super.self.queuePlayer controlsSliderChangeEnded:sender];
+    if ([self isDVRSupported]) { //check for DVR support
+        UISlider *slider = (UISlider *)sender;
+        CMTimeRange seekableRange = [self.queuePlayer.player.currentItem.seekableTimeRanges.lastObject CMTimeRangeValue];
+        CGFloat seekableDuration = CMTimeGetSeconds(seekableRange.duration);
+        BOOL isSliderReachLivePoint = ([slider maximumValue] == [slider value]);
+        if (isSliderReachLivePoint) {
+            [self reloadUrlForDVRSupport:slider WithDuration:seekableDuration];
+        }
+    }
+}
 
 - (UIView<APPlayerControls> *)reshetPlayerControls
 {
