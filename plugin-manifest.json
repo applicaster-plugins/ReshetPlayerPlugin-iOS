@@ -100,13 +100,27 @@
         },
         {
             "type": "text",
-            "key": "OVIDIUS_base_url",
-            "tooltip_text": "OVIDIUS api base url"
+            "key": "ovidius_url",
+            "placeholder": "https://13tv-api.oplayer.io/",
+            "tooltip_text": "ovidius base url for secure video"
         },
         {
             "type": "text",
-            "key": "OVIDIUS_user_id",
-            "tooltip_text": "OVIDIUS api user id"
+            "key": "ovidius_user_ID",
+            "placeholder": "45E4A9FB-FCE8-88BF-93CC-3650C39DDF28",
+            "tooltip_text": "ovidius user id for ovidius api service"
+        },
+        {
+            "type": "text",
+            "key": "ovidius_cdn_name",
+            "placeholder": "cast time",
+            "tooltip_text": "ovidius cdn name"
+        },
+        {
+            "type": "text",
+            "key": "ovidius_ch",
+            "placeholder": "1",
+            "tooltip_text": "ovidius channel"
         }
     ]
 }

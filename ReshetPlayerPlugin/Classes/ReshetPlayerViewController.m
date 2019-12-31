@@ -327,9 +327,11 @@
             [_amsdkapi registerEvent:EVT_AD_SCREEN_TOUCH_DOWN eventDelegate:self];
             [_amsdkapi registerEvent:EVT_AD_SCREEN_TOUCH_UP eventDelegate:self];
             
-            NSDictionary *artiWithStreamParamsDictionary = [self addVideoParametersToArtiParamsDictionary:artiParamsDictionary];
-            AMInitParams* amInitParams = [[AMInitParams alloc] initWithTargetUIView: self.adContainerView
-                                                                             params:artiWithStreamParamsDictionary];
+          //  NSDictionary *artiWithStreamParamsDictionary = [self addVideoParametersToArtiParamsDictionary:artiParamsDictionary];
+//            AMInitParams* amInitParams = [[AMInitParams alloc] initWithTargetUIView: self.adContainerView
+//                                                                             params:artiWithStreamParamsDictionary];
+            
+            AMInitParams* amInitParams = [[AMInitParams alloc]initWithTargetUIView:_adContainerView initJsonBuilder:[self getInitJsonBuilderParams]];
             
             [_amsdkapi initialize:amInitParams];
 
@@ -339,6 +341,42 @@
             NSLog(@"AMSDK Allocation failed. => Continue without AMSDK.");
         }
     }
+}
+
+- (AMInitJsonBuilder *)getInitJsonBuilderParams
+{
+    
+     AMInitJsonBuilder *initJsonBuilder = [[AMInitJsonBuilder alloc] init];
+    
+    if ([self.currentlyPlayingItem isKindOfClass:[APAtomEntryPlayable class]]) {
+           APAtomEntry *atomEntry = ((APAtomEntryPlayable *)self.currentlyPlayingItem).atomEntry;
+
+        [initJsonBuilder putContentDuration:atomEntry.extensions[@"content_duration"]];
+        [initJsonBuilder putContentProgramName:atomEntry.extensions[@"program_name"]];
+        [initJsonBuilder putContentType:atomEntry.extensions[@"content_type"]];
+        [initJsonBuilder putContentSeason:atomEntry.extensions[@"content_season"]];
+        [initJsonBuilder putContentEpisode:atomEntry.extensions[@"content_episode"]];
+        [initJsonBuilder putContentGenre:atomEntry.extensions[@"content_genre"]];
+        [initJsonBuilder putContentTargetAudience:atomEntry.extensions[@"content_target_audience"]];
+        
+    }
+    
+    //        [initJsonBuilder putPlacementSiteKey:self.artiMediaSiteKey];
+    //        [initJsonBuilder putPlacementCategory:CATEGORY];
+    //        [initJsonBuilder putPlacementIsLive:];
+    //        [initJsonBuilder putContentId:@"123456"];
+    //        [initJsonBuilder putContentDuration:@"594"];
+    //        [initJsonBuilder putContentType:@"movies"];
+    //        [initJsonBuilder putContentProgramName:@"content program name"];
+    //        [initJsonBuilder putContentSeason:@"season 01"];
+    //        [initJsonBuilder putContentEpisode:@"episode 02"];
+    //        [initJsonBuilder putContentGenre:@"comedy"];
+    //        [initJsonBuilder putContentTargetAudience:@"18+"];
+    //        [initJsonBuilder putContentVideoUrl:[super.currentContentURL stringByAddingPercentEncodingWithAllowedCharacters:[NSCharacterSet URLHostAllowedCharacterSet]]];
+    //        [initJsonBuilder putContentPublisherId:@"2134123412344"];
+    //        [initJsonBuilder putSubscriberId:@"345ggdf-345g-3245-sdfg4-ffgd"];
+    //        [initJsonBuilder putSubscriberPlan:@"family"];
+   return initJsonBuilder;
 }
 
 - (NSDictionary *)addVideoParametersToArtiParamsDictionary:(NSDictionary *) artiParamsDictionary{

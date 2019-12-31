@@ -19,7 +19,7 @@ Pod::Spec.new do |s|
   s.public_header_files = 'ReshetPlayerPlugin/Classes/**/*.h'
   s.source_files = ['ReshetPlayerPlugin/Classes/**/*.{h,m,swift}']
   s.resources = ['ReshetPlayerPlugin/Resources/**/*.{xib}']
-  s.dependency 'ArtiSDK', '1.1.015'
+  s.dependency 'ArtiSDK', '1.4.000'
   s.dependency 'ZappPlugins'
   s.dependency 'ApplicasterSDK'
 
