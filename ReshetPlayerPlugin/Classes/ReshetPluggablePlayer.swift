@@ -37,24 +37,6 @@ public class ReshetPluggablePlayer: APPlugablePlayerBase, ZPAppLoadingHookProtoc
             instance.playerViewController = ReshetPlayerViewController(playableItems: items)
         }
         
-//        if(instance.currentPlayableItem?.isLive() ?? false){
-//            ReshetPlayerApi(configurationJSON: configurationJSON).getVideoSrcByLink { (success, src) in
-//                if(success){
-//                    if let videoSrc = src{
-//                        instance.playerViewController?.replaceSrc(videoSrc)
-//                    }
-//                }
-//            }
-//        }else{
-//            ReshetPlayerApi(configurationJSON: configurationJSON).getVideoSrcByVideoName(videoName: instance.currentPlayableItem?.identifier as String? ?? "" ) { (success, src) in
-//                if(success){
-//                    if let videoSrc = src{
-//                        instance.playerViewController?.replaceSrc(videoSrc)
-//                    }
-//                }
-//            }
-//        }
-        
         if let configurationJSON = configurationJSON as? [AnyHashable : Any],
             let useCustomVideoLoadin = configurationJSON["use_custom_video_loading"] as? String,
             useCustomVideoLoadin.boolValue() == true,
