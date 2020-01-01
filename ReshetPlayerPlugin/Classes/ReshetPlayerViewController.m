@@ -164,9 +164,11 @@
         }
         
     }
-    if (self.kantarAttributes) {
-        [self startKantarMesurment];
-    }
+    //kantar is out of use right now
+    
+//    if (self.kantarAttributes) {
+//        [self startKantarMesurment];
+//    }
 }
 
 - (void)play {
@@ -208,7 +210,7 @@
     [self stopObservingFacebookNotifications];
     [super viewWillDisappear:animated];
     
-    [self stopKantarMesurment];
+//    [self stopKantarMesurment];
 }
 
 - (void)didReceiveMemoryWarning {
@@ -229,14 +231,14 @@
         } else {
             shouldShowAdsOnPayedItems = NO;
         }
-        [self ConfigureKantarAdapter];
+//        [self ConfigureKantarAdapter];
     }
     _currentlyPlayingItem = items.firstObject;
     _queuePlayer = self.playerController.player;
     _cutTime = [dictionary objectForKey:@"c1_cut_time"];
     _kantarMediaSiteName = [dictionary objectForKey:@"kantar_site_key"];
     self.timeFormat = @"yyyy-MM-dd'T'HH:mm:ssZ";
-    self.liveStreamUrl = dictionary["live_stream_url"];
+    self.liveStreamUrl = dictionary[@"live_stream_url"];
     [self setDelta];
     
     return self;
@@ -266,6 +268,12 @@
 //        [self.kantarAttributes setObject:height forKey:@"sy"];
 //    }
 
+}
+
+- (void)replaceSrc:(NSString *)src{
+    APURLPlayable *item  = _currentlyPlayingItem;
+    [item updateStreamUrl:src];
+    _currentlyPlayingItem = item;
 }
 
 - (void) startKantarMesurment {
@@ -321,9 +329,7 @@
             [_amsdkapi registerEvent:EVT_AD_SCREEN_TOUCH_DOWN eventDelegate:self];
             [_amsdkapi registerEvent:EVT_AD_SCREEN_TOUCH_UP eventDelegate:self];
             
-            NSDictionary *artiWithStreamParamsDictionary = [self addVideoParametersToArtiParamsDictionary:artiParamsDictionary];
-            AMInitParams* amInitParams = [[AMInitParams alloc] initWithTargetUIView: self.adContainerView
-                                                                             params:artiWithStreamParamsDictionary];
+            AMInitParams* amInitParams = [[AMInitParams alloc]initWithTargetUIView:_adContainerView initJsonBuilder:[self getInitJsonBuilderParams]];
             
             [_amsdkapi initialize:amInitParams];
 
@@ -333,6 +339,25 @@
             NSLog(@"AMSDK Allocation failed. => Continue without AMSDK.");
         }
     }
+}
+
+- (AMInitJsonBuilder *)getInitJsonBuilderParams
+{
+    
+     AMInitJsonBuilder *initJsonBuilder = [[AMInitJsonBuilder alloc] init];
+    
+    if ([self.currentlyPlayingItem isKindOfClass:[APAtomEntryPlayable class]]) {
+           APAtomEntry *atomEntry = ((APAtomEntryPlayable *)self.currentlyPlayingItem).atomEntry;
+        [initJsonBuilder putContentProgramName:atomEntry.extensions[@"program_name"]];
+        [initJsonBuilder putContentType:atomEntry.extensions[@"content_type"]];
+        [initJsonBuilder putContentSeason:atomEntry.extensions[@"content_season"]];
+        [initJsonBuilder putContentEpisode:atomEntry.extensions[@"content_episode"]];
+        [initJsonBuilder putContentGenre:atomEntry.extensions[@"content_genre"]];
+        [initJsonBuilder putContentTargetAudience:atomEntry.extensions[@"content_target_audience"]];
+        [initJsonBuilder putPlacementSiteKey:self.artiMediaSiteKey];
+    }
+    
+   return initJsonBuilder;
 }
 
 - (NSDictionary *)addVideoParametersToArtiParamsDictionary:(NSDictionary *) artiParamsDictionary{
@@ -409,7 +434,7 @@
         if(_amsdkapi)
             [_amsdkapi resumeAd];
     }
-    [self startKantarMesurment];
+//    [self startKantarMesurment];
 }
 
 - (void)onPausePressed
@@ -419,7 +444,7 @@
             [_amsdkapi pauseAd];
     } else {
         [self pause];
-        [self stopKantarMesurment];
+//        [self stopKantarMesurment];
     }
 }
 

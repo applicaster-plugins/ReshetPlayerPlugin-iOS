@@ -76,12 +76,14 @@
 //}
 
 - (void)setSliderForDVRSupport {
-    self.seekSlider;
+   
 }
 
 -(void)updateControlsForLiveState:(BOOL)isLive
 {
-    self.seekSlider.isLive = isLive;
+    //self.seekSlider.isLive = isLive;
+    [super updateControlsForLiveState:isLive];
+    
 }
 
 //+ (UIView<APPlayerControls> *)playerControls

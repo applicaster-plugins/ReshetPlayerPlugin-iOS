@@ -24,6 +24,7 @@
 
 
 - (void)setMaximumValue:(float)maximumValue {
+    [super setMaximumValue:maximumValue];
     NSLog(@"\n\n💙💙💙💙  slider maximum value is in %f  💙💙💙💙\n\n", maximumValue);
 //    if ([self.delegate respondsToSelector:@selector(setSliderForDVRSupport)]) {
 //        [self.delegate setSliderForDVRSupport];
