@@ -11,43 +11,40 @@
 #import "KMA_SpringStreams.h"
 #import "ReshetPlayerViewController.h"
 
-@interface Reshet_MediaPlayerAdapter()
+@interface KMA_MediaPlayerAdapter()
 
-@property (nonatomic, strong) ReshetPlayerViewController *playerVC;
+@property (nonatomic, strong) AVPlayerViewController *playerVC;
 @property (nonatomic, strong) KMA_Player_Meta *meta;
 
 @end
+ 
+@implementation KMA_MediaPlayerAdapter
 
-@implementation Reshet_MediaPlayerAdapter
-
-- (Reshet_MediaPlayerAdapter*)adapter:(ReshetPlayerViewController *)player {
+- (KMA_MediaPlayerAdapter *)adapter:(AVPlayerViewController *)player{
     _playerVC = player;
     return [super init];
 }
 
+
 #pragma KMA_StreamAdapter Protocol
 
-//-(KMA_Player_Meta* )getMeta {
-//    NSDictionary *params = self.playerVC.artiParams;
-//    _meta = [[KMA_Player_Meta alloc] init];
-//    _meta.playername = params[@"kantart player name"];//@"ReshetPlayerViewController";
-//    _meta.playerversion = params[@"kantar_player_version"];
-//    _meta.screenwidth = [self getWidth];
-//    _meta.screenheight = [self getHeight];
-//    return _meta;
-//}
+-(KMA_Player_Meta* )getMeta {
+    _meta = [[KMA_Player_Meta alloc] init];
+    _meta.screenwidth = [self getWidth];
+    _meta.screenheight = [self getHeight];
+    return _meta;
+}
 
 - (int) getPosition {
-    APQueuePlayer *queuePlayer = _playerVC.playerController.player;
-    int livePosition = CMTimeGetSeconds(queuePlayer.player.currentItem.currentTime);
+    int livePosition = CMTimeGetSeconds(_playerVC.player.currentItem.currentTime);
     if(livePosition < 0) livePosition = 0;
     return livePosition;
 }
 
 - (int) getDuration {
-    APQueuePlayer *queuePlayer = _playerVC.playerController.player;
-    return CMTimeGetSeconds(queuePlayer.player.currentItem.duration);
+    return CMTimeGetSeconds(_playerVC.player.currentItem.duration);
 }
+
 
 - (int) getWidth {
     return _playerVC.view.bounds.size.width;
@@ -66,6 +63,51 @@
     _playerVC = nil;
     _meta = nil;
 }
+
+
+
+
 @end
 
+@implementation KMA_Player_Meta
 
+/**
+ * Returns the player name
+ *
+ * @return the string "MediaPlayer"
+ */
+@synthesize playername;
+ 
+/**
+ * Returns the player version.
+ * The itselfs has no version so the system version is delivered.
+ *
+ * @see http://developer.apple.com/library/ios/#documentation/uikit/reference/UIDevice_Class/Reference/UIDevice.html
+ *
+ * @return The version my calling [UIDevice currentDevice].systemVersion
+ */
+@synthesize playerversion;
+ 
+/**
+ * Returns the screen width my calling the method
+ * [[UIScreen mainScreen] bounds].screenRect.size.width
+ *
+ * @see http://developer.apple.com/library/ios/#documentation/uikit/reference/UIScreen_Class/Reference/UIScreen.html
+ *
+ * @return the width
+ */
+@synthesize screenwidth;
+ 
+/**
+ * Returns the screen width my calling the method
+ * [[UIScreen mainScreen] bounds].screenRect.size.height
+ *
+ * @see http://developer.apple.com/library/ios/#documentation/uikit/reference/UIScreen_Class/Reference/UIScreen.html
+ *
+ * @return the height
+ */
+@synthesize screenheight;
+ 
+
+
+@end
