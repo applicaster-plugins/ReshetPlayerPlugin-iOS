@@ -1,7 +1,7 @@
 Pod::Spec.new do |s|
 
   s.name             = 'ReshetPlayerPlugin'
-  s.version          = '0.1.0'
+  s.version          = '0.2.0'
   s.summary          = 'ReshetPlayerPlugin'
   s.description      = 'Plugin Player for Reshet including DVR support and arti media adds'
   s.homepage         = 'https://github.com/applicaster-plugins/ReshetPlayerPlugin-iOS'
