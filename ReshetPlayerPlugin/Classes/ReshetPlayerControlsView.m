@@ -81,10 +81,24 @@
 
 -(void)updateControlsForLiveState:(BOOL)isLive
 {
-    //self.seekSlider.isLive = isLive;
-    [super updateControlsForLiveState:isLive];
+    self.recordTimeLabel.hidden = isLive;
+    self.seekSlider.isLive = isLive;
+   [super updateControlsForLiveState:isLive];
     
 }
+
+- (void)setCurrentTime:(NSTimeInterval)currentTime{
+//
+//    [self.seekSlider setMinimumValue:0];
+//    [self.seekSlider setMaximumValue:currentTime];
+//    [self.seekSlider setValue:currentTime];
+    [super setCurrentTime:currentTime];
+    
+}
+
+
+
+
 
 //+ (UIView<APPlayerControls> *)playerControls
 //{

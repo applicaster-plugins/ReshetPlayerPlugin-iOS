@@ -10,6 +10,8 @@
 #import "ArtiSDK/AMSDK.h"
 #import "KMA_SpringStreams.h"
 
+
+
 @import Foundation;
 @import ZappPlugins;
 
@@ -35,11 +37,13 @@
 
 #pragma mark - Kantar variables
 
+@property (nonatomic, strong) NSString *kantarMediaStream;
 @property (nonatomic, strong) NSString *kantarMediaSiteName;
 @property (nonatomic, strong) NSMutableDictionary *kantarAttributes;
 @property (nonatomic, strong) KMA_SpringStreams *tracker;
 @property (nonatomic, strong) KMA_Stream *kantarStream;
-@property (nonatomic, strong) Reshet_MediaPlayerAdapter *adapter;
+@property (nonatomic, strong) KMA_MediaPlayerAdapter *adapter;
+@property (strong,nonatomic) AVPlayerViewController* avPlayerViewController;
 @property (nonatomic, assign) NSTimeInterval timeIntervalFromServer;
 @property (nonatomic, assign) BOOL didSetDeltaInStorage;
 @property (nonatomic, assign) NSTimeInterval delta;
@@ -47,6 +51,7 @@
 @property (nonatomic, strong) NSString *timeFormat;
 @property (nonatomic, strong) id<ZPPlayable> currentlyPlayingItem;
 @property (nonatomic, strong) NSString *liveStreamUrl;
+@property (nonatomic, strong) NSString *liveStreamSecureUrl;
 
 @end
 
@@ -164,14 +169,42 @@
         }
         
     }
-    //kantar is out of use right now
-    
-//    if (self.kantarAttributes) {
-//        [self startKantarMesurment];
-//    }
+
+    if (self.kantarAttributes) {
+        [self startKantarMesurment];
+    }
+}
+- (void)close:(id)sender{
+    if(sender){
+        [self dismissViewControllerAnimated:true completion:^{
+          
+        }];
+    }else{
+        UIImageView *errorImage = [[UIImageView alloc] initWithFrame:CGRectMake(0, 0, self.playerController.loadingView.width, self.playerController.loadingView.height)];
+        errorImage.image = [UIImage imageNamed:@"error_reshet"];
+        [self.playerController.loadingView addSubview:errorImage];
+        [self.playerController.loadingView bringSubviewToFront:self.playerController.loadingView.cancelButton];
+    }
+ }
+
+
+- (AVURLAsset *)assetUrlFromString:(NSString *)urlString {
+    AVURLAsset *assetUrl = nil;
+    NSURL *url = [NSURL URLWithString:urlString];
+    if (url) {
+        assetUrl = [AVURLAsset URLAssetWithURL:url options:nil];
+    }
+    return assetUrl;
 }
 
+
 - (void)play {
+    if(isLive && _liveStreamSecureUrl.isNotEmpty){
+        APURLPlayable *item  = _currentlyPlayingItem;
+        APChannel *channl = ((APChannel*)item);
+        [channl setStreamURL:_liveStreamSecureUrl];
+        _currentlyPlayingItem = ((APURLPlayable*)channl);
+    }
     [super play];
     if (self.queuePlayer.player.currentItem.seekableTimeRanges.isNotEmpty) {
         //self.ReshetPlayerControlsView
@@ -182,6 +215,7 @@
         NSLog(@"\n\n💜💜💜💜  PLAYING  💜💜💜💜\n\n");
     }
 }
+
 
 - (BOOL)isDVRSupported {
 
@@ -210,7 +244,7 @@
     [self stopObservingFacebookNotifications];
     [super viewWillDisappear:animated];
     
-//    [self stopKantarMesurment];
+   [self stopKantarMesurment];
 }
 
 - (void)didReceiveMemoryWarning {
@@ -231,12 +265,12 @@
         } else {
             shouldShowAdsOnPayedItems = NO;
         }
-//        [self ConfigureKantarAdapter];
+       [self configureKantarAdapter:dictionary];
     }
     _currentlyPlayingItem = items.firstObject;
     _queuePlayer = self.playerController.player;
     _cutTime = [dictionary objectForKey:@"c1_cut_time"];
-    _kantarMediaSiteName = [dictionary objectForKey:@"kantar_site_key"];
+   
     self.timeFormat = @"yyyy-MM-dd'T'HH:mm:ssZ";
     self.liveStreamUrl = dictionary[@"live_stream_url"];
     [self setDelta];
@@ -254,26 +288,30 @@
     }
 }
 
-- (void)ConfigureKantarAdapter {
+- (void)configureKantarAdapter:(NSDictionary *)dictionary {
+    _kantarMediaSiteName = [dictionary objectForKey:@"kantar_site_key"];
+    _kantarMediaStream = [dictionary objectForKey:@"kantar_attribute_stream_value"];
     NSString *appDisplayName = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleDisplayName"];
-    //self.tracker = [KMA_SpringStreams getInstance:_kantarMediaSiteName a:appDisplayName];
-    //self.adapter = [[Reshet_MediaPlayerAdapter alloc] adapter:self];
+//    self.tracker = [KMA_SpringStreams getInstance:_kantarMediaSiteName a:appDisplayName];
+    _avPlayerViewController = [[AVPlayerViewController alloc] init];
+    _avPlayerViewController.player = self.playerController.player.player;
+    self.adapter = [[KMA_MediaPlayerAdapter alloc] adapter:_avPlayerViewController];
+    self.adapter.getMeta.playername = [dictionary objectForKey:@"kantar_player_version_name"];
+    self.adapter.getMeta.playerversion = [dictionary objectForKey:@"kantar_player_version"];
     self.kantarAttributes = [[NSMutableDictionary alloc] init];
-//    NSString *width = [NSString stringWithFormat:@"%d",[self.adapter getWidth]];
-//    NSString *height = [NSString stringWithFormat:@"%d",[self.adapter  getHeight]];
-//    if ([width isNotEmpty]) {
-//        [self.kantarAttributes setObject:width forKey:@"sx"];
-//    }
-//    if ([height isNotEmpty]) {
-//        [self.kantarAttributes setObject:height forKey:@"sy"];
-//    }
-
+    [self.kantarAttributes setObject:_kantarMediaSiteName forKey:@"sitename="];
+    [self.kantarAttributes setObject:_kantarMediaStream forKey:@"stream"];
 }
+
 
 - (void)replaceSrc:(NSString *)src{
     APURLPlayable *item  = _currentlyPlayingItem;
-    [item updateStreamUrl:src];
-    _currentlyPlayingItem = item;
+    if(_currentlyPlayingItem.isLive){
+        _liveStreamSecureUrl = src;
+    }else{
+        [item updateStreamUrl:src];
+       _currentlyPlayingItem = item;
+    }
 }
 
 - (void) startKantarMesurment {
@@ -297,6 +335,8 @@
 - (BOOL)ignoreAdsOnChangeMode {
     return ((self.lastPlayerDisplayMode == APPlayerViewControllerDisplayModeInline && self.currentPlayerDisplayMode == APPlayerViewControllerDisplayModeFullScreen) || (self.lastPlayerDisplayMode == APPlayerViewControllerDisplayModeFullScreen && self.currentPlayerDisplayMode == APPlayerViewControllerDisplayModeInline));
 }
+
+
 
 - (UIView*)adContainerView
 {
@@ -434,7 +474,7 @@
         if(_amsdkapi)
             [_amsdkapi resumeAd];
     }
-//    [self startKantarMesurment];
+    [self startKantarMesurment];
 }
 
 - (void)onPausePressed
@@ -444,7 +484,7 @@
             [_amsdkapi pauseAd];
     } else {
         [self pause];
-//        [self stopKantarMesurment];
+        [self stopKantarMesurment];
     }
 }
 

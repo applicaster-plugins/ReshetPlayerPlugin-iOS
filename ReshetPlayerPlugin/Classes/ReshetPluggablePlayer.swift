@@ -30,6 +30,26 @@ public class ReshetPluggablePlayer: APPlugablePlayerBase, ZPAppLoadingHookProtoc
         instance.currentPlayableItem = items?.first
         instance.configurationJSON = configurationJSON
         
+        if((instance.currentPlayableItem?.isLive())!){
+            ReshetPlayerApi(configurationJSON: configurationJSON).getVideoSrcByLink { (success, src) in
+                if(success){
+                    if let videoSrc = src{
+                        instance.playerViewController?.replaceSrc(videoSrc)
+                    }
+                }
+            }
+        }else{
+            if let videoName = instance.currentPlayableItem?.identifier as String?{
+                ReshetPlayerApi(configurationJSON: configurationJSON).getVideoSrcByVideoName(videoName: videoName) { (success, src) in
+                    if(success){
+                        if let videoSrc = src{
+                            instance.playerViewController?.replaceSrc(videoSrc)
+                        }
+                    }
+                }
+            }
+        }
+        
         if let configurationJSON = configurationJSON as? [AnyHashable : Any] {
             instance.playerViewController = ReshetPlayerViewController(playableItems: items,
                                                                      withArtiMediaParams: configurationJSON)
@@ -92,6 +112,7 @@ public class ReshetPluggablePlayer: APPlugablePlayerBase, ZPAppLoadingHookProtoc
         
     }
     
+    
     @objc func stop() {
         removeObservers()
         let weakSelf = self
@@ -108,6 +129,8 @@ public class ReshetPluggablePlayer: APPlugablePlayerBase, ZPAppLoadingHookProtoc
         }
         return loadingView
     }
+    
+    
     
     public func executeOnApplicationReady(displayViewController: UIViewController?, completion: (() -> Void)?) {
         self.getServerForCurrentTime()

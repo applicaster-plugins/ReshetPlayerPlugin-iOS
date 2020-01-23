@@ -24,16 +24,22 @@
 
 
 - (void)setMaximumValue:(float)maximumValue {
-    [super setMaximumValue:maximumValue];
+    if(!_isLive){
+        [super setMaximumValue:maximumValue];
+    }else{
+//        if ([self.delegate respondsToSelector:@selector(setSliderForDVRSupport)]) {
+//                [self.delegate setSliderForDVRSupport];
+//            }
+    }
     NSLog(@"\n\n💙💙💙💙  slider maximum value is in %f  💙💙💙💙\n\n", maximumValue);
-//    if ([self.delegate respondsToSelector:@selector(setSliderForDVRSupport)]) {
-//        [self.delegate setSliderForDVRSupport];
-//    }
+
 }
 
 - (void)setValue:(float)value {
     NSLog(@"\n\n💛💛💛💛  slider time is %f  💛💛💛💛\n\n", value);
-    [super setValue:value];
+    if(!_isLive){
+        [super setValue:value];
+    }
 }
 
 - (void)setMinimumValue:(float)minimumValue {
@@ -48,6 +54,7 @@
     [super setMinimumValue:minimumValue];
     
 }
+
 
 - (void)dealloc
 {

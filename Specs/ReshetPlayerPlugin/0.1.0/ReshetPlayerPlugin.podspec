@@ -13,33 +13,43 @@ Pod::Spec.new do |s|
   s.platform               = :ios, '10.0'
   s.requires_arc           = true
   s.static_framework       = true
-  s.swift_version          = '5.0'
+  s.swift_version          = '5.1'
 
-  s.subspec 'Kantar' do |k|
-    k.vendored_libraries  = 'ReshetPlayerPlugin/Kantar/kantarmedia-streaming-fat.a'
-    k.public_header_files = "ReshetPlayerPlugin/Kantar/*.h"
-    k.source_files = 'ReshetPlayerPlugin/Kantar/*.{swift,h,m}'
-    # k.xcconfig = {
-    #                 'OTHER_LDFLAGS' => '$(inherited) -l"kantarmedia-streaming-fat"'
-    #              }
-  end
+  c.frameworks = 'UIKit'
+  c.public_header_files = 'ReshetPlayerPlugin/Classes/**/*.h'
+  c.source_files = ['ReshetPlayerPlugin/Classes/**/*.{h,m,swift}']
+  c.resources = ['ReshetPlayerPlugin/Resources/**/*.{xib}']
+  c.dependency 'ArtiSDK', '1.4.000'
+  c.dependency 'ZappPlugins'
+  c.dependency 'ApplicasterSDK'
+  # c.dependency 'KantarKitAdapter'
 
-  s.subspec 'Core' do |c|
-    c.frameworks = 'UIKit'
-    c.public_header_files = 'ReshetPlayerPlugin/Classes/**/*.h'
-    c.source_files = ['ReshetPlayerPlugin/Classes/**/*.{h,m,swift}']
-    c.resources = ['ReshetPlayerPlugin/Resources/**/*.{xib}']
-    c.dependency 'ArtiSDK', '1.4.000'
-    c.dependency 'ZappPlugins'
-    c.dependency 'ApplicasterSDK'
-  end
+  # s.subspec 'Kantar' do |k|
+  #   k.vendored_libraries  = 'ReshetPlayerPlugin/Kantar/kantarmedia-streaming-fat.a'
+  #   k.public_header_files = "ReshetPlayerPlugin/Kantar/*.h"
+  #   k.source_files = 'ReshetPlayerPlugin/Kantar/*.{swift,h,m}'
+  #   # k.xcconfig = {
+  #   #                 'OTHER_LDFLAGS' => '$(inherited) -l"kantarmedia-streaming-fat"'
+  #   #              }
+  # end
+
+  # s.subspec 'Core' do |c|
+  #   c.frameworks = 'UIKit'
+  #   c.public_header_files = 'ReshetPlayerPlugin/Classes/**/*.h'
+  #   c.source_files = ['ReshetPlayerPlugin/Classes/**/*.{h,m,swift}']
+  #   c.resources = ['ReshetPlayerPlugin/Resources/**/*.{xib}']
+  #   c.dependency 'ArtiSDK', '1.4.000'
+  #   c.dependency 'ZappPlugins'
+  #   c.dependency 'ApplicasterSDK'
+  #   c.dependency 'KantarKitAdapter'
+  # end
 
   s.xcconfig =  {
                   'CLANG_ALLOW_NON_MODULAR_INCLUDES_IN_FRAMEWORK_MODULES' => 'YES',
                   'ENABLE_BITCODE' => 'YES',
-                  'SWIFT_VERSION' => '5.0'
+                  'SWIFT_VERSION' => '5.1'
                 }
 
-  s.default_subspec = 'Core', 'Kantar'
+  # s.default_subspec = 'Core', 'Kantar'
 
 end
