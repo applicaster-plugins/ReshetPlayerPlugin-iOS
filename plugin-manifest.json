@@ -12,14 +12,14 @@
     "platform": "ios",
     "author_name": "Roi Kedarya",
     "author_email": "r.kedarya@applicaster.com",
-    "manifest_version": "0.2.0",
+    "manifest_version": "0.3.0",
     "name": "Reshet Player",
     "description": "Plugin Player for Reshet including DVR support and arti media adds and Kantar media library for rating measurement",
     "type": "player",
     "identifier": "ReshetPlayerPlugin",
     "ui_builder_support": false,
     "dependency_name": "ReshetPlayerPlugin",
-    "dependency_version": "0.2.0",
+    "dependency_version": "0.3.0",
     "whitelisted_account_ids": [
         "5891b9f978f9f300171455e5",
         "576fceae636566000f000000"

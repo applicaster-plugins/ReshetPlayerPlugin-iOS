@@ -395,6 +395,8 @@
         [initJsonBuilder putContentGenre:atomEntry.extensions[@"content_genre"]];
         [initJsonBuilder putContentTargetAudience:atomEntry.extensions[@"content_target_audience"]];
         [initJsonBuilder putPlacementSiteKey:self.artiMediaSiteKey];
+    }else{
+        [initJsonBuilder putPlacementSiteKey:self.artiMediaSiteKey];
     }
     
    return initJsonBuilder;
