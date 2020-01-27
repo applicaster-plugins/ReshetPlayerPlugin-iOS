@@ -159,6 +159,10 @@
     [super setControls:controls];
 }
 
+- (UIView<APPlayerControls> *)controls{
+    return self.playerController.controls;
+}
+
 - (void)viewDidAppear:(BOOL)animated {
     
     [self observeFacebookNotifications];
@@ -205,6 +209,7 @@
         [channl setStreamURL:_liveStreamSecureUrl];
         _currentlyPlayingItem = ((APURLPlayable*)channl);
     }
+    
     [super play];
     if (self.queuePlayer.player.currentItem.seekableTimeRanges.isNotEmpty) {
         //self.ReshetPlayerControlsView
@@ -753,6 +758,7 @@
     NSDate *currentServerTime = [[NSDate date] dateByAddingTimeInterval:delta];
     return currentServerTime;
 }
+
 
  /*
   time frame is the number of hours for the c+1 time frame as defined by kantar.

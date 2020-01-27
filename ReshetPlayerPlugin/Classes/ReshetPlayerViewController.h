@@ -20,7 +20,7 @@
 
 - (instancetype)initWithPlayableItems:(NSArray*)items withArtiMediaParams:(NSDictionary *)dictionary;
 
-- (void)setControls:(UIView<APPlayerControls> *)controls;
+//- (void)setControls:(UIView<APPlayerControls> *)controls;
 
 - (BOOL)isDVRSupported;
 
