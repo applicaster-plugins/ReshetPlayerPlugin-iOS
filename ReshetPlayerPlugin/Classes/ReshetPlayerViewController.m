@@ -155,6 +155,7 @@
 
 }
 
+
 - (void)setControls:(UIView<APPlayerControls> *)controls {
     [super setControls:controls];
 }
@@ -392,7 +393,16 @@
      AMInitJsonBuilder *initJsonBuilder = [[AMInitJsonBuilder alloc] init];
     
     if ([self.currentlyPlayingItem isKindOfClass:[APAtomEntryPlayable class]]) {
-           APAtomEntry *atomEntry = ((APAtomEntryPlayable *)self.currentlyPlayingItem).atomEntry;
+        
+        APAtomEntry *atomEntry = ((APAtomEntryPlayable *)self.currentlyPlayingItem).atomEntry;
+        [initJsonBuilder putPlacementCategory:atomEntry.identifier];
+        [initJsonBuilder putContentId:atomEntry.identifier];
+        [initJsonBuilder putPlacementIsLive:self.currentlyPlayingItem.isLive];
+        NSString *url = _currentlyPlayingItem.assetUrl.URL.absoluteString;
+        if(url != nil){
+            NSString *urlDecode = [url stringByAddingPercentEncodingWithAllowedCharacters:[NSCharacterSet alphanumericCharacterSet]];
+            [initJsonBuilder putContentVideoUrl:urlDecode];
+        }
         [initJsonBuilder putContentProgramName:atomEntry.extensions[@"program_name"]];
         [initJsonBuilder putContentType:atomEntry.extensions[@"content_type"]];
         [initJsonBuilder putContentSeason:atomEntry.extensions[@"content_season"]];
@@ -406,6 +416,7 @@
     
    return initJsonBuilder;
 }
+
 
 - (NSDictionary *)addVideoParametersToArtiParamsDictionary:(NSDictionary *) artiParamsDictionary{
     NSMutableDictionary *retValue;
