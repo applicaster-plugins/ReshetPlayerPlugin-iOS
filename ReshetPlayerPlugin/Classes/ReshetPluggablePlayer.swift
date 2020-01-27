@@ -88,6 +88,7 @@ public class ReshetPluggablePlayer: APPlugablePlayerBase, ZPAppLoadingHookProtoc
         if let playerViewController = self.playerViewController {
             playerViewController.currentPlayerDisplayMode = APPlayerViewControllerDisplayMode.inline
             playerViewController.controls = playerViewController.reshetInlinePlayerControls()
+            playerViewController.modalPresentationStyle = .fullScreen
         }
     }
     
