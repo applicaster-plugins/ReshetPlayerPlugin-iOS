@@ -31,9 +31,7 @@ Pod::Spec.new do |s|
     k.public_header_files = "ReshetPlayerPlugin/Kantar/*.h"
     k.source_files = 'ReshetPlayerPlugin/Kantar/*.{swift,h,m}'
     k.xcconfig = {
-      # 'LIBRARY_SEARCH_PATHS' => '$(PODS_ROOT)/ReshetPlayerPlugin/Kantar/Frameworks/*',
-      #  'HEADER_SEARCH_PATHS' => '$(PODS_ROOT)/ReshetPlayerPlugin/Kantar/*',
-      #  'OTHER_LDFLAGS' => '$(inherited)'
+                    # 'OTHER_LDFLAGS' => '$(inherited) -l"kantarmedia-streaming-fat"'
                  }
   end
 

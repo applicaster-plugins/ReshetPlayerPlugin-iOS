@@ -390,28 +390,27 @@
 - (AMInitJsonBuilder *)getInitJsonBuilderParams
 {
     
-     AMInitJsonBuilder *initJsonBuilder = [[AMInitJsonBuilder alloc] init];
+    AMInitJsonBuilder *initJsonBuilder = [[AMInitJsonBuilder alloc] init];
     
+    [initJsonBuilder putPlacementSiteKey:self.artiMediaSiteKey];
+    [initJsonBuilder putPlacementIsLive:self.currentlyPlayingItem.isLive];
+    NSString *url = _currentlyPlayingItem.assetUrl.URL.absoluteString;
+    if(url != nil){
+        NSString *urlDecode = [url stringByAddingPercentEncodingWithAllowedCharacters:[NSCharacterSet alphanumericCharacterSet]];
+        [initJsonBuilder putContentVideoUrl:urlDecode];
+    }
     if ([self.currentlyPlayingItem isKindOfClass:[APAtomEntryPlayable class]]) {
         
         APAtomEntry *atomEntry = ((APAtomEntryPlayable *)self.currentlyPlayingItem).atomEntry;
         [initJsonBuilder putPlacementCategory:atomEntry.identifier];
         [initJsonBuilder putContentId:atomEntry.identifier];
-        [initJsonBuilder putPlacementIsLive:self.currentlyPlayingItem.isLive];
-        NSString *url = _currentlyPlayingItem.assetUrl.URL.absoluteString;
-        if(url != nil){
-            NSString *urlDecode = [url stringByAddingPercentEncodingWithAllowedCharacters:[NSCharacterSet alphanumericCharacterSet]];
-            [initJsonBuilder putContentVideoUrl:urlDecode];
-        }
         [initJsonBuilder putContentProgramName:atomEntry.extensions[@"program_name"]];
         [initJsonBuilder putContentType:atomEntry.extensions[@"content_type"]];
         [initJsonBuilder putContentSeason:atomEntry.extensions[@"content_season"]];
         [initJsonBuilder putContentEpisode:atomEntry.extensions[@"content_episode"]];
         [initJsonBuilder putContentGenre:atomEntry.extensions[@"content_genre"]];
         [initJsonBuilder putContentTargetAudience:atomEntry.extensions[@"content_target_audience"]];
-        [initJsonBuilder putPlacementSiteKey:self.artiMediaSiteKey];
-    }else{
-        [initJsonBuilder putPlacementSiteKey:self.artiMediaSiteKey];
+       
     }
     
    return initJsonBuilder;
@@ -707,12 +706,20 @@
     if ([notification.object isKindOfClass:[APPlayer class]]) {
         APPlayer *player = notification.object;
         if (player.durationType == APPlayerContentDurationTypeIndefinite) {
+            if(player.currentPlaybackTime > 0){
+                CMTimeRange seekableRange = [player.player.currentItem.seekableTimeRanges.lastObject CMTimeRangeValue];
+                CGFloat seekableDuration = CMTimeGetSeconds(seekableRange.duration);
+                if ([self.controls isKindOfClass:[ReshetPlayerControlsView class]]) {
+                    [((ReshetPlayerControlsView *)self.controls).seekSlider setInitialValuesWith:seekableRange];
+                    [self.controls setDuration:seekableDuration];
+                }
+            }
             if ([self.controls respondsToSelector:@selector(updateControlsForLiveState:)]){
                 if ([self isDVRSupported]) {
                     //APSlider *slider = self.playerController.controls.seekSlider;
-                    [self.controls updateControlsForLiveState:NO];
+                    [self.controls updateControlsForLiveState:YES];
                 } else {
-                   [self.controls updateControlsForLiveState:YES];
+                   [self.controls updateControlsForLiveState:NO];
                 }
             }
         }
