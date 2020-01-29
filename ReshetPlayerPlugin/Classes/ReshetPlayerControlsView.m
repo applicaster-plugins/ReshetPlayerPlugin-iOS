@@ -20,6 +20,7 @@
 
 
 
+
 - (void)awakeFromNib
 {
     [super awakeFromNib];
@@ -81,19 +82,47 @@
 
 -(void)updateControlsForLiveState:(BOOL)isLive
 {
-    self.recordTimeLabel.hidden = isLive;
     self.seekSlider.isLive = isLive;
-   [super updateControlsForLiveState:isLive];
+   [super updateControlsForLiveState:NO];
     
 }
 
+- (void)setDuration:(NSTimeInterval)duration{
+    [super setDuration:duration];
+}
+
 - (void)setCurrentTime:(NSTimeInterval)currentTime{
-//
-//    [self.seekSlider setMinimumValue:0];
-//    [self.seekSlider setMaximumValue:currentTime];
-//    [self.seekSlider setValue:currentTime];
-    [super setCurrentTime:currentTime];
-    
+
+    if(self.seekSlider.isLive){
+        _playbackCurrentTime = currentTime;
+        int totalSeconds = (int)currentTime;
+        int seconds = totalSeconds % 60;
+        int minutes = (totalSeconds / 60) % 60;
+        int hours = totalSeconds / 3600;
+        
+        int totalSecondsDuration = (int)_playbackDuration;
+               int secondsDuration = totalSecondsDuration % 60;
+               int minutesDuration = (totalSecondsDuration / 60) % 60;
+               int hoursDuration = totalSecondsDuration / 3600;
+        
+        NSString *playbackTime = @"";
+           
+           if (_playbackCurrentTime > 0.0){
+               if (_playbackDuration >= _playbackCurrentTime){
+                   playbackTime = [NSString stringWithFormat:@"%@ / %@",
+                                   [NSString stringWithFormat:@"%02d:%02d:%02d",hours, minutes, seconds],
+                                   [NSString stringWithFormat:@"%02d:%02d:%02d",hoursDuration, minutesDuration, secondsDuration]];
+               }
+               else{
+
+                   playbackTime = [NSString stringWithFormat:@"%02d:%02d:%02d",hours, minutes, seconds];
+               }
+           }
+           _timeLabel.text = playbackTime;
+           [_timeLabel setNeedsLayout];
+    }else{
+         [super setCurrentTime:currentTime];
+    }
 }
 
 
