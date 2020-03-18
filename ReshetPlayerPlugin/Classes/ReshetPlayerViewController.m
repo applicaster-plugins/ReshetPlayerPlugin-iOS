@@ -298,7 +298,7 @@
     _kantarMediaSiteName = [dictionary objectForKey:@"kantar_site_key"];
     _kantarMediaStream = [dictionary objectForKey:@"kantar_attribute_stream_value"];
     NSString *appDisplayName = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleDisplayName"];
-//    self.tracker = [KMA_SpringStreams getInstance:_kantarMediaSiteName a:appDisplayName];
+    self.tracker = [KMA_SpringStreams getInstance:_kantarMediaSiteName a:appDisplayName];
     _avPlayerViewController = [[AVPlayerViewController alloc] init];
     _avPlayerViewController.player = self.playerController.player.player;
     self.adapter = [[KMA_MediaPlayerAdapter alloc] adapter:_avPlayerViewController];
