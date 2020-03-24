@@ -2,6 +2,7 @@
 //  ReshetPlayerViewController.h
 //
 @import ApplicasterSDK;
+#import "KMA_SpringStreams.h"
 
 #import <UIKit/UIKit.h>
 #define UPDATE_TIME_DELAY           1.0
@@ -14,6 +15,7 @@
 
 @interface ReshetPlayerViewController : APPlayerViewController
 
+@property (nonatomic, strong) KMA_SpringStreams *tracker;
 @property (nonatomic, strong) NSDictionary* artiParams;
 @property (nonatomic, strong) APQueuePlayer *queuePlayer;
 //@property (nonatomic, strong) UIView<APPlayerControls> *controls;

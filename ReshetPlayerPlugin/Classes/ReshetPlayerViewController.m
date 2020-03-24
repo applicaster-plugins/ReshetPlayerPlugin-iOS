@@ -40,7 +40,6 @@
 @property (nonatomic, strong) NSString *kantarMediaStream;
 @property (nonatomic, strong) NSString *kantarMediaSiteName;
 @property (nonatomic, strong) NSMutableDictionary *kantarAttributes;
-@property (nonatomic, strong) KMA_SpringStreams *tracker;
 @property (nonatomic, strong) KMA_Stream *kantarStream;
 @property (nonatomic, strong) KMA_MediaPlayerAdapter *adapter;
 @property (strong,nonatomic) AVPlayerViewController* avPlayerViewController;
@@ -228,7 +227,7 @@
     BOOL retVal = NO;
     NSURL *CurrentlyPlayingUrl = self.currentlyPlayingItem.assetUrl.URL;//[self CurrentlyPlayingUrl];
     retVal = ([[CurrentlyPlayingUrl absoluteString] containsString:@"DVR"]);
-    return YES;//retVal;
+    return retVal;
 }
 
 - (void)viewWillDisappear:(BOOL)animated {
@@ -297,8 +296,6 @@
 - (void)configureKantarAdapter:(NSDictionary *)dictionary {
     _kantarMediaSiteName = [dictionary objectForKey:@"kantar_site_key"];
     _kantarMediaStream = [dictionary objectForKey:@"kantar_attribute_stream_value"];
-    NSString *appDisplayName = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleDisplayName"];
-    self.tracker = [KMA_SpringStreams getInstance:_kantarMediaSiteName a:appDisplayName];
     _avPlayerViewController = [[AVPlayerViewController alloc] init];
     _avPlayerViewController.player = self.playerController.player.player;
     self.adapter = [[KMA_MediaPlayerAdapter alloc] adapter:_avPlayerViewController];
@@ -321,7 +318,7 @@
 }
 
 - (void) startKantarMesurment {
-    if (self.kantarAttributes && isLive) {
+    if (self.kantarAttributes && self.tracker && isLive) {
         self.kantarStream = [self.tracker track:self.adapter atts:self.kantarAttributes];
     }
 }
@@ -716,10 +713,11 @@
             }
             if ([self.controls respondsToSelector:@selector(updateControlsForLiveState:)]){
                 if ([self isDVRSupported]) {
-                    //APSlider *slider = self.playerController.controls.seekSlider;
-                    [self.controls updateControlsForLiveState:YES];
+                    if ([self.controls isKindOfClass:[ReshetPlayerControlsView class]]) {
+                        [((ReshetPlayerControlsView *)self.controls) setSliderForDVRSupport];
+                    }
                 } else {
-                   [self.controls updateControlsForLiveState:NO];
+                    [self.controls updateControlsForLiveState:YES];
                 }
             }
         }

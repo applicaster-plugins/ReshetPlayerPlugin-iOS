@@ -14,12 +14,19 @@ import Foundation
     var oviduisUserId:String?
     var oviduisCdnName:String?
     var oviduisCh:String?
+    var liveDVRSupport = false
+    
     
     required init(configurationJSON: NSDictionary?) {
         baseApi = configurationJSON?["OVIDIUS_base_url"] as? String ?? "https://13tv-api.oplayer.io/"
         oviduisUserId = configurationJSON?["OVIDIUS_user_id"] as? String ?? "45E4A9FB-FCE8-88BF-93CC-3650C39DDF28"
         oviduisCdnName = configurationJSON?["OVIDIUS_cdn_name"] as? String ?? "casttime"
         oviduisCh = configurationJSON?["OVIDIUS_ch"] as? String ?? "1"
+        if let dvrSupportSting = configurationJSON?["support_live_dvr"] as? String{
+            liveDVRSupport = (dvrSupportSting == "1")
+        }else if let dvrSupportBool = configurationJSON?["support_live_dvr"] as? Bool{
+            liveDVRSupport = dvrSupportBool
+        }
     }
     
     let getVideoByName = "api/getlink/getVideoByFileName"
@@ -60,15 +67,19 @@ import Foundation
         request.httpMethod = "GET"
         makeRequest(request: request) { (responseJson, response, error) in
             if(response?.statusCode == 200){
-                 if let json = responseJson as? [[String:Any]]{
+                if let json = responseJson as? [[String:Any]]{
                     if let link  = json[0]["Link"] as? String{
-                        var src = ""
-                        if(link.contains("?")){
-                            src = "\(link)&DVR=true"
+                        if(self.liveDVRSupport){
+                            var src = ""
+                            if(link.contains("?")){
+                                src = "\(link)&DVR=true"
+                            }else{
+                                src = "\(link)?DVR=true"
+                            }
+                             completion(true, src)
                         }else{
-                            src = "\(link)?DVR=true"
+                            completion(true, link)
                         }
-                        completion(true, src)
                     }else{
                         completion(false , nil)
                     }
