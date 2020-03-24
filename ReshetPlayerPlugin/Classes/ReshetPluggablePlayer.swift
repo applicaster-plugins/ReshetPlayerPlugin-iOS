@@ -7,6 +7,8 @@ import ApplicasterSDK
 import ZappPlugins
 import UIKit
 
+var kantarSensor:KMA_SpringStreams?
+
 public class ReshetPluggablePlayer: APPlugablePlayerBase, ZPAppLoadingHookProtocol {
     
     var serverTimeUrl: String?
@@ -15,7 +17,13 @@ public class ReshetPluggablePlayer: APPlugablePlayerBase, ZPAppLoadingHookProtoc
     
     public required override init() { }
 
-    public required init(configurationJSON: NSDictionary?) { }
+    public required init(configurationJSON: NSDictionary?) {
+        if(kantarSensor == nil){
+            if let siteName = configurationJSON?["kantar_site_key"] as? String, let displayName = Bundle.main.object(forInfoDictionaryKey: "CFBundleDisplayName") as? String {
+                 kantarSensor = KMA_SpringStreams.getInstance(siteName, a: displayName)
+            }
+        }
+    }
     
     public static func pluggablePlayerInit(playableItem item: ZPPlayable?) -> ZPPlayerProtocol?{
         if let item = item {
@@ -56,6 +64,11 @@ public class ReshetPluggablePlayer: APPlugablePlayerBase, ZPAppLoadingHookProtoc
         } else {
             instance.playerViewController = ReshetPlayerViewController(playableItems: items)
         }
+        
+        if let sensor = kantarSensor {
+             instance.playerViewController?.tracker = sensor
+        }
+      
         
         if let configurationJSON = configurationJSON as? [AnyHashable : Any],
             let useCustomVideoLoadin = configurationJSON["use_custom_video_loading"] as? String,

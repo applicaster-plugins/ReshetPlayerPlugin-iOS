@@ -77,14 +77,13 @@
 //}
 
 - (void)setSliderForDVRSupport {
-   
+   self.seekSlider.isLive = true;
+   [super updateControlsForLiveState:NO];
 }
 
 -(void)updateControlsForLiveState:(BOOL)isLive
 {
-    self.seekSlider.isLive = isLive;
-   [super updateControlsForLiveState:NO];
-    
+   [super updateControlsForLiveState:isLive];
 }
 
 - (void)setDuration:(NSTimeInterval)duration{
